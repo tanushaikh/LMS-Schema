@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class Role(models.Model):
     name = models.CharField(max_length=100)
@@ -47,7 +49,7 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
 class Profile(models.Model):
-    user = models.OneToOneField("accounts.User", on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     full_name = models.CharField(max_length=150)
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, blank=True)

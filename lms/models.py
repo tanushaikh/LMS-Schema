@@ -53,7 +53,7 @@ class User(AbstractUser):
 
 # Profile
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lms_profile_user')
     full_name = models.CharField(max_length=150)
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, blank=True)
@@ -74,7 +74,7 @@ class Course(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='course_thumbnails/')
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lms_course_user")
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, blank=True)
@@ -86,7 +86,7 @@ class Course(models.Model):
 
 # Meeting
 class Meeting(models.Model):
-    host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lms_meeting_user')
     title = models.CharField(max_length=200)
     meeting_link = models.URLField()
     platform = models.CharField(max_length=100)
@@ -124,7 +124,7 @@ class Assignment(models.Model):
     description = models.TextField()
     due_date = models.DateTimeField()
     attachment = models.FileField(upload_to='assignments/', null=True, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name="lms_assign_user")
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
@@ -135,7 +135,7 @@ class Assignment(models.Model):
 # AssignmentSubmission
 class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lms_assig_user')
     submission_file = models.FileField(upload_to='submissions/')
     submitted_at = models.DateTimeField(default=timezone.now)
     grade = models.CharField(max_length=10, blank=True)
@@ -144,7 +144,7 @@ class AssignmentSubmission(models.Model):
 
 # AITutorInteraction
 class AITutorInteraction(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_ai_user')
     question = models.TextField()
     ai_response = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
@@ -152,7 +152,7 @@ class AITutorInteraction(models.Model):
 
 # Achievement
 class Achievement(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_ach_user')
     title = models.CharField(max_length=200)
     description = models.TextField()
     earned_on = models.DateTimeField()
@@ -161,7 +161,7 @@ class Achievement(models.Model):
 
 # Certificate
 class Certificate(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_certificate_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     issued_on = models.DateTimeField()
     certificate_file = models.FileField(upload_to='certificates/')
@@ -169,7 +169,7 @@ class Certificate(models.Model):
 
 # Analytics
 class Analytics(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='_lms_analytics_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     progress_percent = models.FloatField()
     sessions_completed = models.IntegerField()
@@ -178,7 +178,7 @@ class Analytics(models.Model):
 
 # Notification
 class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_notifications_user')
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -187,7 +187,7 @@ class Notification(models.Model):
 
 # Feedback
 class Feedback(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_feedback_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.TextField()
@@ -196,7 +196,7 @@ class Feedback(models.Model):
 
 # CourseEnrollment
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_course_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)
@@ -204,15 +204,15 @@ class CourseEnrollment(models.Model):
 
 # Bookmark
 class Bookmark(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_bookmark_user')
+    #session = models.ForeignKey(Session, on_delete=models.CASCADE)
     note = models.TextField(blank=True)
     slug = models.SlugField(unique=True)
 
 # Discussion
 class Discussion(models.Model):
-    session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    #session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='discussion_user')
     message = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True)

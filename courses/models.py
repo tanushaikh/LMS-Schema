@@ -7,7 +7,7 @@ class Course(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='course_thumbnails/')
-    created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='create_course_user')
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, blank=True)
@@ -18,7 +18,7 @@ class Course(models.Model):
         super().save(*args, **kwargs)
 
 class Meeting(models.Model):
-    host = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    host = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='meetings_hosted')
     title = models.CharField(max_length=200)
     meeting_link = models.URLField()
     platform = models.CharField(max_length=100)
@@ -33,7 +33,7 @@ class Meeting(models.Model):
         super().save(*args, **kwargs)
 
 class Session(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    # course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = models.TextField()
     start_time = models.DateTimeField()
@@ -49,7 +49,7 @@ class Session(models.Model):
         super().save(*args, **kwargs)
 
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='course_enr_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)
