@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'assignments',
     'interactions',
     'achievements',
-    'sessions',
     'schedule',
+    "session_lms",
 
 ]
 AUTH_USER_MODEL = 'lms.User'

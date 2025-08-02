@@ -2,16 +2,16 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 from django.conf import settings
-from sessions.models import Course
+# from sessions.models import Course
 
 
 class Assignment(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    #course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
     due_date = models.DateTimeField()
     attachment = models.FileField(upload_to='assignments/', null=True, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='Assignment_user')
     slug = models.SlugField(unique=True, blank=True, null=True)  # ✅ allow blank slug
 
     def save(self, *args, **kwargs):
@@ -24,7 +24,7 @@ class Assignment(models.Model):
 
 class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='AssignmentSubmission_user')
     submission_file = models.FileField(upload_to='submissions/')
     submitted_at = models.DateTimeField(default=timezone.now)
     grade = models.CharField(max_length=10, blank=True)
