@@ -1,0 +1,40 @@
+from django.db import models
+from django.utils.text import slugify
+from django.utils import timezone
+from django.conf import settings
+from sessions.models import Course
+
+
+class Assignment(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    due_date = models.DateTimeField()
+    attachment = models.FileField(upload_to='assignments/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    slug = models.SlugField(unique=True, blank=True, null=True)  # ✅ allow blank slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.course.id}")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    submission_file = models.FileField(upload_to='submissions/')
+    submitted_at = models.DateTimeField(default=timezone.now)
+    grade = models.CharField(max_length=10, blank=True)
+    feedback = models.TextField(blank=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)  # ✅ fix
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.assignment.title}-{self.user.id}")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.assignment.title} - {self.user.username}"
