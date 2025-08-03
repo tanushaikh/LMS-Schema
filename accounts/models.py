@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-User = get_user_model()
+
 
 class Role(models.Model):
     name = models.CharField(max_length=100)
@@ -42,6 +41,8 @@ class User(AbstractUser):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)
+
+    REQUIRED_FIELDS = ['email']
 
     def save(self, *args, **kwargs):
         if not self.slug:

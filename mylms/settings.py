@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-=r=!a6$m2$j6xo$!-)p^*2_6z(xp0pkm@zi&=3p4*a@iqeid$z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "lms",
     "accounts",
+    "lms",
     "courses",
     'assignments',
     'interactions',
@@ -47,8 +47,8 @@ INSTALLED_APPS = [
     "session_lms",
 
 ]
-AUTH_USER_MODEL = 'lms.User'
-# AUTH_USER_MODEL = 'accounts.User'
+#AUTH_USER_MODEL = 'lms.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
