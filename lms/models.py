@@ -3,6 +3,8 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Role
 class Role(models.Model):
@@ -38,22 +40,22 @@ class RolePermission(models.Model):
         super().save(*args, **kwargs)
 
 # User
-class User(AbstractUser):
-    email = models.EmailField(unique=True)
-    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(unique=True, blank=True)
+# class User(AbstractUser):
+#     email = models.EmailField(unique=True)
+#     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+#     is_active = models.BooleanField(default=True)
+#     created_at = models.DateTimeField(default=timezone.now)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     slug = models.SlugField(unique=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.username)
-        super().save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.username)
+#         super().save(*args, **kwargs)
 
 # Profile
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lms_profile_user')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lms_profile_user')
     full_name = models.CharField(max_length=150)
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, blank=True)
@@ -74,7 +76,7 @@ class Course(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='course_thumbnails/')
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lms_course_user")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lms_course_created_user")
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, blank=True)
@@ -196,7 +198,7 @@ class Feedback(models.Model):
 
 # CourseEnrollment
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_course_user')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_course_enr_user')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)
