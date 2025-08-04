@@ -35,9 +35,16 @@ class RolePermission(models.Model):
         super().save(*args, **kwargs)
 
 class User(AbstractUser):
+    USER_TYPE_CHOICES = (
+        ('student', 'Student'),
+        ('instructor', 'Instructor'),
+        ('admin', 'Admin'),
+    )
+
     email = models.EmailField(unique=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
+    is_active = models.BooleanField(default=False)  # User inactive until admin approves
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)

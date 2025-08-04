@@ -45,10 +45,19 @@ INSTALLED_APPS = [
     'achievements',
     'schedule',
     "session_lms",
+    'rest_framework',
+    'rest_framework.authtoken',
+
 
 ]
 #AUTH_USER_MODEL = 'lms.User'
 AUTH_USER_MODEL = 'accounts.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
