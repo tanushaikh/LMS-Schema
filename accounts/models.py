@@ -35,19 +35,24 @@ class RolePermission(models.Model):
         super().save(*args, **kwargs)
 
 class User(AbstractUser):
+    
     USER_TYPE_CHOICES = (
         ('student', 'Student'),
         ('instructor', 'Instructor'),
         ('admin', 'Admin'),
     )
+    
+    
 
     email = models.EmailField(unique=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
     is_active = models.BooleanField(default=False)  # User inactive until admin approves
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)
+    
 
     REQUIRED_FIELDS = ['email']
 
@@ -71,3 +76,21 @@ class Profile(models.Model):
         if not self.slug:
             self.slug = slugify(f"{self.user.username}-profile")
         super().save(*args, **kwargs)
+        
+        
+class UserLog(models.Model):
+    ACTION_CHOICES = [
+        ('login', 'Login'),
+        ('logout', 'Logout'),
+        ('register', 'Register'),
+        ('update', 'Update'),
+        ('delete', 'Delete'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.action} at {self.timestamp}"

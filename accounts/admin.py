@@ -1,7 +1,12 @@
 
 from django.contrib import admin
-from .models import Role, Permission, RolePermission, Profile
+from .models import Role, Permission, RolePermission, Profile,UserLog
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
+@admin.register(UserLog)
+class UserLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'action', 'timestamp', 'ip_address')
+   
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
@@ -22,3 +27,4 @@ class RolePermissionAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'full_name', 'mobile', 'country', 'slug')
     search_fields = ('user__username', 'full_name', 'mobile')
+    
