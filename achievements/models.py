@@ -1,12 +1,25 @@
 from django.db import models
+from django.utils.text import slugify
+import uuid
 
 class Achievement(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='ach_Achievement_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='ach_Achievement_user')
     title = models.CharField(max_length=200)
     description = models.TextField()
     earned_on = models.DateTimeField()
     icon = models.ImageField(upload_to='achievements/')
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            unique_slug = base_slug
+            num = 1
+            while Achievement.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
 class Certificate(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='ach_Certificate_user')

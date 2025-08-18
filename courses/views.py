@@ -1,7 +1,18 @@
+
+from datetime import datetime, timedelta
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+
+from accounts.models import UserLog
+from accounts.views import get_client_ip
+from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+
 
 from .models import Course, Meeting, Session, CourseEnrollment
 from .serializers import CourseSerializer, MeetingSerializer, SessionSerializer, CourseEnrollmentSerializer
@@ -9,20 +20,86 @@ from .serializers import CourseSerializer, MeetingSerializer, SessionSerializer,
 
 # ----------- COURSE CRUD -----------
 class CourseListCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         courses = Course.objects.all()
         serializer = CourseSerializer(courses, many=True)
+        
+        if request.user.is_authenticated:
+            recent_log_exists = UserLog.objects.filter(
+                user=request.user,
+                action="get all courses",
+                timestamp__gte=timezone.now() - timedelta(seconds=5)
+            ).exists()
+
+            if not recent_log_exists:
+                UserLog.objects.create(
+                    user=request.user,
+                    action="get all courses",
+                    ip_address=get_client_ip(request)
+                )
+        else:
+            # Log as anonymous user
+            recent_log_exists = UserLog.objects.filter(
+                user=None,
+                action="get all courses",
+                timestamp__gte=timezone.now() - timedelta(seconds=5)
+            ).exists()
+            
+            if not recent_log_exists:
+                UserLog.objects.create(
+                    user=None,
+                    action="get all courses",
+                    ip_address=get_client_ip(request)
+                )
+
         return Response(serializer.data)
 
+
+
+    
     def post(self, request):
         serializer = CourseSerializer(data=request.data)
+        
         if serializer.is_valid():
-            serializer.save()
+            # Log action
+            if request.user.is_authenticated:
+                recent_log_exists = UserLog.objects.filter(
+                    user=request.user,
+                    action=f"course create",
+                    timestamp__gte=timezone.now() - timedelta(seconds=5)
+                ).exists()
+
+                if not recent_log_exists:
+                    UserLog.objects.create(
+                        user=request.user,
+                        action=f"course create",
+                        ip_address=get_client_ip(request)
+                    )
+            else:
+                # Log as anonymous user
+                recent_log_exists = UserLog.objects.filter(
+                    user=None,
+                    action=f"anonymous course create",
+                    timestamp__gte=timezone.now() - timedelta(seconds=5)
+                ).exists()
+
+                if not recent_log_exists:
+                    UserLog.objects.create(
+                        user=None,
+                        action=f"anonymous course create",
+                        ip_address=get_client_ip(request)
+                    )
+           
+            serializer.save(created_by=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CourseDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         serializer = CourseSerializer(course)
@@ -31,15 +108,81 @@ class CourseDetailView(APIView):
     def put(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         serializer = CourseSerializer(course, data=request.data, partial=True)
+
         if serializer.is_valid():
+            # Log action
+            if request.user.is_authenticated:
+                recent_log_exists = UserLog.objects.filter(
+                    user=request.user,
+                    action=f"course detail update {pk}",
+                    timestamp__gte=timezone.now() - timedelta(seconds=5)
+                ).exists()
+
+                if not recent_log_exists:
+                    UserLog.objects.create(
+                        user=request.user,
+                        action=f"course detail update {pk}",
+                        ip_address=get_client_ip(request)
+                    )
+            else:
+                # Log as anonymous user
+                recent_log_exists = UserLog.objects.filter(
+                    user=None,
+                    action=f"anonymous course detail update {pk}",
+                    timestamp__gte=timezone.now() - timedelta(seconds=5)
+                ).exists()
+
+                if not recent_log_exists:
+                    UserLog.objects.create(
+                        user=None,
+                        action=f"anonymous course detail update {pk}",
+                        ip_address=get_client_ip(request)
+                    )
+
+            # ✅ Save the updated course after logging
             serializer.save()
             return Response(serializer.data)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def delete(self, request, pk):
         course = get_object_or_404(Course, pk=pk)
         course.delete()
-        return Response({"message": "Course deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+        # Log action
+        if request.user.is_authenticated:
+            recent_log_exists = UserLog.objects.filter(
+                user=request.user,
+                action=f"delete course {pk}",
+                timestamp__gte=timezone.now() - timedelta(seconds=5)
+            ).exists()
+
+            if not recent_log_exists:
+                UserLog.objects.create(
+                    user=request.user,
+                    action=f"delete course {pk}",
+                    ip_address=get_client_ip(request)
+                )
+        else:
+            # Log as anonymous user
+            recent_log_exists = UserLog.objects.filter(
+                user=None,
+                action=f"anonymous delete course {pk}",
+                timestamp__gte=timezone.now() - timedelta(seconds=5)
+            ).exists()
+
+            if not recent_log_exists:
+                UserLog.objects.create(
+                    user=None,
+                    action=f"anonymous delete course {pk}",
+                    ip_address=get_client_ip(request)
+                )
+
+        return Response(
+            {"message": "Course deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 # ----------- MEETING CRUD -----------

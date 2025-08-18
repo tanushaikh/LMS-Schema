@@ -4,7 +4,7 @@ from .models import Course, Meeting, Session, CourseEnrollment
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ["title","description","category",]
+        fields = ["id", "title", "description", "category", "slug"]  # slug add kiya
         read_only_fields = ['slug', 'created_at']
 
 class MeetingSerializer(serializers.ModelSerializer):
