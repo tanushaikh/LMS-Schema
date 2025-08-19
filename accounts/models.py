@@ -90,14 +90,13 @@ class RolePermission(models.Model):
 # -------------------------------
 # USER MODEL
 # -------------------------------
-class User(AbstractUser):
-    USER_TYPE_CHOICES = (
+USER_TYPE_CHOICES = (
         ('student', 'Student'),
         ('instructor', 'Instructor'),
         ('admin', 'Admin'),
     )
-
-    username = None
+class User(AbstractUser):
+    username = models.CharField(max_length=150, unique=True)  # re-add username
     email = models.EmailField(unique=True)
 
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
@@ -108,7 +107,7 @@ class User(AbstractUser):
     slug = models.SlugField(unique=True, blank=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["user_type"]
+    REQUIRED_FIELDS = ["username", "user_type"]
     objects = UserManager()
 
     def save(self, *args, **kwargs):
