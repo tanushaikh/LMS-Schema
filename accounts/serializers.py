@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Profile
+from .models import User, Profile,Post
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,3 +38,10 @@ class LoginSerializer(serializers.Serializer):
             return user
         raise serializers.ValidationError("Invalid credentials")
     
+class PostSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source="user.email")  # show email instead of ID
+
+    class Meta:
+        model = Post
+        fields = ["id", "user", "title", "content", "created_at", "updated_at", "slug"]
+        read_only_fields = ["id", "user", "created_at", "updated_at", "slug"]

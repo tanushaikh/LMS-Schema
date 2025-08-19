@@ -6,10 +6,10 @@ from .models import (
     Notification, Feedback, CourseEnrollment, Bookmark, Discussion
 )
 
-admin.site.register(Role)
-admin.site.register(Permission)
-admin.site.register(RolePermission)
-admin.site.register(User)
+# admin.site.register(Role)
+# admin.site.register(Permission)
+# admin.site.register(RolePermission)
+# admin.site.register(User)
 admin.site.register(Profile)
 admin.site.register(Course)
 

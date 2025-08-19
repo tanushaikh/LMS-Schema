@@ -1,9 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.text import slugify
 from django.utils import timezone
-from django.contrib.auth.models import BaseUserManager
 
+
+# -------------------------------
+# USER MANAGER
+# -------------------------------
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -18,34 +21,58 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        
+
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
-        
+
         return self.create_user(email, password, **extra_fields)
 
+
+# -------------------------------
+# ROLE MODEL
+# -------------------------------
 class Role(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.TextField()
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:                                                 
+        if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
+
+# -------------------------------
+# PERMISSION MODEL
+# -------------------------------
 class Permission(models.Model):
-    app_model = models.CharField(max_length=100)
-    permission_type = models.CharField(max_length=10)
+    app_label = models.CharField(max_length=100)  # app name
+    model_name = models.CharField(max_length=100)  # model name
+    permission_type = models.CharField(max_length=10, choices=[
+        ("add", "Add"),
+        ("view", "View"),
+        ("edit", "Edit"),
+        ("delete", "Delete"),
+    ])
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.app_model}-{self.permission_type}")
+            self.slug = slugify(f"{self.app_label}-{self.model_name}-{self.permission_type}")
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{self.app_label}.{self.model_name} - {self.permission_type}"
+
+
+# -------------------------------
+# ROLE PERMISSION
+# -------------------------------
 class RolePermission(models.Model):
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
@@ -56,6 +83,13 @@ class RolePermission(models.Model):
             self.slug = slugify(f"{self.role.name}-{self.permission.slug}")
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{self.role.name} - {self.permission}"
+
+
+# -------------------------------
+# USER MODEL
+# -------------------------------
 class User(AbstractUser):
     USER_TYPE_CHOICES = (
         ('student', 'Student'),
@@ -63,7 +97,7 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
 
-    username = models.CharField(max_length=20, unique=True, null=False, blank=False)   
+    username = None
     email = models.EmailField(unique=True)
 
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
@@ -73,14 +107,22 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)
 
-    USERNAME_FIELD = "username"     
-    REQUIRED_FIELDS = ["email", "user_type"]  
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["user_type"]
     objects = UserManager()
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.email)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.email
+
+
+# -------------------------------
+# PROFILE MODEL
+# -------------------------------
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
     full_name = models.CharField(max_length=150)
@@ -94,15 +136,42 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.user.username}-profile")
+            self.slug = slugify(f"{self.user.email}-profile")
         super().save(*args, **kwargs)
-        
-        
+
+    def __str__(self):
+        return self.full_name
+
+
+# -------------------------------
+# USER LOG
+# -------------------------------
 class UserLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    action = models.CharField(max_length=255)  # 🔹 Choices hata diya
+    action = models.CharField(max_length=255)
+    model_name = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username if self.user else 'Anonymous'} - {self.action} at {self.timestamp}"
+        return f"{self.user.email if self.user else 'Anonymous'} - {self.action} ({self.model_name})"
+
+
+# -------------------------------
+# POST MODEL (User can create posts/views)
+# -------------------------------
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.user.id}")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
