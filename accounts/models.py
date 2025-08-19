@@ -63,7 +63,7 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
 
-    username = None 
+    username = models.CharField(max_length=20, unique=True, null=False, blank=False)   
     email = models.EmailField(unique=True)
 
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
@@ -73,8 +73,8 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)
 
-    USERNAME_FIELD = "email"     
-    REQUIRED_FIELDS = ["user_type"]  
+    USERNAME_FIELD = "username"     
+    REQUIRED_FIELDS = ["email", "user_type"]  
     objects = UserManager()
 
     def save(self, *args, **kwargs):

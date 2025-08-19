@@ -87,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "mylms.asgi.application"
+WSGI_APPLICATION = "mylms.wsgi.application"
 
 
 # Database
