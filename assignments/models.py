@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 from django.conf import settings
 # from sessions.models import Course
-
+import uuid
 
 class Assignment(models.Model):
     #course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -33,8 +33,9 @@ class AssignmentSubmission(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.assignment.title}-{self.user.id}")
+            base_slug = slugify(self.assignment.title)
+            # add random part
+            self.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
         super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.assignment.title} - {self.user.username}"
