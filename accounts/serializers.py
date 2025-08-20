@@ -16,7 +16,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             is_active=False
         )
         return user
-        def update(self, instance, validated_data):
+    def update(self, instance, validated_data):
             password = validated_data.pop('password', None)  # remove password if exists
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
@@ -24,6 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                 instance.set_password(password)  # hash password
             instance.save()
             return instance
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()

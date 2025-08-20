@@ -12,12 +12,12 @@ class Assignment(models.Model):
     due_date = models.DateTimeField()
     attachment = models.FileField(upload_to='assignments/', null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='Assignment_user')
-    slug = models.SlugField(unique=True, blank=True, null=True)  # ✅ allow blank slug
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.title}-{self.course.id}")
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(f"{self.title}-{self.course.id}")
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

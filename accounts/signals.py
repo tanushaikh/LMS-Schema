@@ -3,7 +3,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from .models import UserLog, Post, Profile
-
+from assignments.models import *
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
 
@@ -17,6 +17,8 @@ def log_action(user, action, instance):
         model_name=model_name
     )
     logger.info(f"{user} - {action} on {model_name} (ID: {instance.pk})")
+
+
 
 
 # -------------------------------
@@ -59,3 +61,31 @@ def log_profile_save(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Profile)
 def log_profile_delete(sender, instance, **kwargs):
     log_action(instance.user, "Deleted Profile", instance)
+
+
+# -------------------------------
+# ASSIGNMENT LOGGING
+# -------------------------------
+@receiver(post_save, sender=Assignment)
+def log_assignment_save(sender, instance, created, **kwargs):
+    action = "Created Assignment" if created else "Updated Assignment"
+    log_action(instance.created_by, action, instance)
+
+
+@receiver(post_delete, sender=Assignment)
+def log_assignment_delete(sender, instance, **kwargs):
+    log_action(instance.created_by, "Deleted Assignment", instance)
+
+
+# -------------------------------
+# ASSIGNMENT SUBMISSION LOGGING
+# -------------------------------
+@receiver(post_save, sender=AssignmentSubmission)
+def log_submission_save(sender, instance, created, **kwargs):
+    action = "Created Submission" if created else "Updated Submission"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=AssignmentSubmission)
+def log_submission_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Submission", instance)
