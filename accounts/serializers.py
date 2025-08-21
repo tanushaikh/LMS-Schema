@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Profile,Post,Permission,Role,RolePermission
+from .models import User, Profile,Post,Role,RolePermission,Permission,UserLog
+
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -43,6 +46,20 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ["id", "user", "title", "content", "created_at", "updated_at", "slug"]
         read_only_fields = ["id", "user", "created_at", "updated_at", "slug"]
+        
+
+
+# -------------------------------
+# PROFILE SERIALIZER
+# -------------------------------
+class ProfileSerializer(serializers.ModelSerializer):
+    user = RegisterSerializer(read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ["id", "user", "full_name", "age", "gender", "bio",
+                  "profile_picture", "mobile", "country", "slug"]
+
 
 # -------------------------------
 # ROLE SERIALIZER
@@ -50,7 +67,8 @@ class PostSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = ['id', 'name', 'description', 'slug']
+        fields = ["id", "name", "description", "slug"]
+
 
 
 # -------------------------------
@@ -59,6 +77,7 @@ class RoleSerializer(serializers.ModelSerializer):
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
+
         fields = ['id', 'app_label', 'model_name', 'permission_type', 'slug']
 
 

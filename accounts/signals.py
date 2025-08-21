@@ -3,6 +3,8 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from .models import UserLog, Post, Profile
+from courses.models import *
+
 from assignments.models import *
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
@@ -89,3 +91,63 @@ def log_submission_save(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=AssignmentSubmission)
 def log_submission_delete(sender, instance, **kwargs):
     log_action(instance.user, "Deleted Submission", instance)
+    
+
+# -------------------------------
+# COURSES 
+# -------------------------------
+@receiver(post_save, sender=Course)
+def log_course_save(sender, instance, created, **kwargs):
+    action = "Created Course" if created else "Updated Course"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Course)
+def log_course_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted course", instance)
+    
+    
+    
+# -------------------------------
+# Meeting 
+# -------------------------------
+@receiver(post_save, sender=Course)
+def log_course_save(sender, instance, created, **kwargs):
+    action = "Created Course" if created else "Updated Course"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Course)
+def log_course_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted course", instance)
+    
+
+# -------------------------------
+# Session
+# -------------------------------
+@receiver(post_save, sender=Session)
+def log_session_save(sender, instance, created, **kwargs):
+    action = "Created Session" if created else "Updated Session"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Session)
+def log_session_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Session", instance)
+    
+    
+# -------------------------------
+# CourseEnrollment
+# -------------------------------
+@receiver(post_save, sender=CourseEnrollment)
+def log_course_enrollment_save(sender, instance, created, **kwargs):
+    action = "Created CourseEnrollment" if created else "Updated CourseEnrollment"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=CourseEnrollment)
+def log_course_enrollment_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted CourseEnrollment", instance)
+    
+    
+    
