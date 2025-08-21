@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login
-from accounts.serializers import RegisterSerializer, LoginSerializer,PostSerializer
-from accounts.models import UserLog, User,Post
+from accounts.serializers import RegisterSerializer, LoginSerializer,PostSerializer,RolePermissionSerializer,PermissionSerializer,RoleSerializer
+from accounts.models import UserLog, User,Post,RolePermission,Role,Permission
 from datetime import timedelta
 from django.utils import timezone
 import logging
@@ -241,3 +241,26 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+# -------------------------------
+# ROLE VIEWSET
+# -------------------------------
+class RoleViewSet(viewsets.ModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+
+# -------------------------------
+# PERMISSION VIEWSET
+# -------------------------------
+class PermissionViewSet(viewsets.ModelViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+
+
+# -------------------------------
+# ROLE PERMISSION VIEWSET
+# -------------------------------
+class RolePermissionViewSet(viewsets.ModelViewSet):
+    queryset = RolePermission.objects.all()
+    serializer_class = RolePermissionSerializer

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Profile,Post
+from .models import User, Profile,Post,Permission,Role,RolePermission
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -43,3 +43,39 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ["id", "user", "title", "content", "created_at", "updated_at", "slug"]
         read_only_fields = ["id", "user", "created_at", "updated_at", "slug"]
+
+# -------------------------------
+# ROLE SERIALIZER
+# -------------------------------
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'description', 'slug']
+
+
+# -------------------------------
+# PERMISSION SERIALIZER
+# -------------------------------
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ['id', 'app_label', 'model_name', 'permission_type', 'slug']
+
+
+# -------------------------------
+# ROLE PERMISSION SERIALIZER
+# -------------------------------
+class RolePermissionSerializer(serializers.ModelSerializer):
+    role = RoleSerializer(read_only=True)
+    permission = PermissionSerializer(read_only=True)
+
+    role_id = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(), write_only=True, source="role"
+    )
+    permission_id = serializers.PrimaryKeyRelatedField(
+        queryset=Permission.objects.all(), write_only=True, source="permission"
+    )
+
+    class Meta:
+        model = RolePermission
+        fields = ['id', 'role', 'permission', 'slug', 'role_id', 'permission_id']
