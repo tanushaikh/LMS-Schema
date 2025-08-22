@@ -1,0 +1,99 @@
+{
+  "info": {
+    "name": "Assignment API",
+    "_postman_id": "12345678-aaaa-bbbb-cccc-1234567890ab",
+    "description": "CRUD API for Assignments & Submissions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Assignments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/assignments/"
+      }
+    },
+    {
+      "name": "Create Assignment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Math Assignment 1\",\n  \"description\": \"Solve all problems\",\n  \"due_date\": \"2025-08-25T10:00:00Z\"\n}"
+        },
+        "url": "{{base_url}}/api/assignments/"
+      }
+    },
+    {
+      "name": "Update Assignment",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated Math Assignment\",\n  \"description\": \"Updated problems\",\n  \"due_date\": \"2025-08-30T10:00:00Z\"\n}"
+        },
+        "url": "{{base_url}}/api/assignments/1/"
+      }
+    },
+    {
+      "name": "Delete Assignment",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/api/assignments/1/"
+      }
+    },
+    {
+      "name": "Get All Submissions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/submissions/"
+      }
+    },
+    {
+      "name": "Create Submission",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "multipart/form-data" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "assignment", "value": "1", "type": "text" },
+            { "key": "submission_file", "type": "file", "src": "/path/to/solution.pdf" }
+          ]
+        },
+        "url": "{{base_url}}/api/submissions/"
+      }
+    },
+    {
+      "name": "Update Submission (Grade/Feedback)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"grade\": \"A+\",\n  \"feedback\": \"Excellent work\"\n}"
+        },
+        "url": "{{base_url}}/api/submissions/1/"
+      }
+    },
+    {
+      "name": "Delete Submission",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/api/submissions/1/"
+      }
+    }
+  ]
+}

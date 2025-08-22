@@ -18,9 +18,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
     serializer_class = MeetingSerializer
 
 
-class SessionViewSet(viewsets.ModelViewSet):
-    queryset = Session.objects.all()
-    serializer_class = SessionSerializer
+
 
 
 class CourseEnrollmentViewSet(viewsets.ModelViewSet):

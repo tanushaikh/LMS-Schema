@@ -42,24 +42,19 @@ INSTALLED_APPS = [
     "lms",
     "courses",
     'assignments',
-    'interactions',
     'achievements',
     'schedule',
     "session_lms",
     'rest_framework',
     'rest_framework.authtoken',
+    "corsheaders",
 
 
 ]
 #AUTH_USER_MODEL = 'lms.User'
 AUTH_USER_MODEL = 'accounts.User'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # 🔓 No auth required anywhere
-    ]
-}
-APPEND_SLASH=True 
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -69,6 +64,14 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
 ]
 
 ROOT_URLCONF = "mylms.urls"
@@ -182,6 +185,16 @@ LOGGING = {
         },
     },
 }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}
+
+APPEND_SLASH=True 
 AUTHENTICATION_BACKENDS = [
     "accounts.backends.UsernameOrEmailBackend",
 ]

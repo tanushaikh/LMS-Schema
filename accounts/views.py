@@ -12,6 +12,8 @@ from rest_framework import viewsets, permissions,status
 from rest_framework.permissions import IsAuthenticated
 from lms.models import *
 from django.db import transaction, DatabaseError
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
@@ -53,7 +55,7 @@ class RegisterView(APIView):
 
 
 from django.db.models import Q
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     def post(self, request):
         logger.info("Login API called")

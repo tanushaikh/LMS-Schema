@@ -41,21 +41,7 @@ class Meeting(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
-class Session(models.Model):
-    # course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    recording_url = models.URLField()
-    is_live = models.BooleanField(default=False)
-    meeting = models.OneToOneField(Meeting, on_delete=models.SET_NULL, null=True, blank=True)
-    slug = models.SlugField(unique=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
 
 class CourseEnrollment(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='course_enr_user')

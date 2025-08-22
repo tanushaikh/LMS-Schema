@@ -7,21 +7,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from courses.models import Course
-# Meeting
-class Meeting(models.Model):
-    host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lms_meeting_user')
-    title = models.CharField(max_length=200)
-    meeting_link = models.URLField()
-    platform = models.CharField(max_length=100)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    recorded = models.BooleanField(default=False)
-    slug = models.SlugField(unique=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
 
 
 # AITutorInteraction

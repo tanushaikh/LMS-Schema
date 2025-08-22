@@ -4,6 +4,9 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from .models import UserLog, Post, Profile
 from courses.models import *
+from achievements.models import *
+from lms.models import *
+from schedule.models import Schedule
 
 from assignments.models import *
 logger = logging.getLogger('lmsapp')
@@ -150,4 +153,123 @@ def log_course_enrollment_delete(sender, instance, **kwargs):
     log_action(instance.user, "Deleted CourseEnrollment", instance)
     
     
+# -------------------------------
+#Achievement
+# -------------------------------
+@receiver(post_save, sender=Achievement)
+def log_achievement_save(sender, instance, created, **kwargs):
+    action = "Created Achievement" if created else "Updated Achievement"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Achievement)
+def log_achievement_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Achievement", instance)
+    
+
+# -------------------------------
+#Certificate
+# -------------------------------
+@receiver(post_save, sender=Certificate)
+def log_certificate_save(sender, instance, created, **kwargs):
+    action = "Created Certificate" if created else "Updated Certificate"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Certificate)
+def log_certificate_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Certificate", instance)
+# -------------------------------
+#Analytics
+# -------------------------------
+@receiver(post_save, sender=Analytics)
+def log_analytics_save(sender, instance, created, **kwargs):
+    action = "Created Analytics" if created else "Updated Analytics"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=Analytics)
+def log_analytics_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Analytics", instance)  
+    
+
+# -------------------------------
+#AITutorInteraction/lms
+# -------------------------------
+@receiver(post_save, sender=AITutorInteraction)
+def log_aITutorinteraction_save(sender, instance, created, **kwargs):
+    action = "Created AITutorInteraction" if created else "Updated AITutorInteraction"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender=AITutorInteraction)
+def log_AITutorinteraction_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted AITutorInteraction", instance)  
+    
+    
+# -------------------------------
+# Notification/lms
+# -------------------------------
+@receiver(post_save, sender= Notification)
+def log_notification_save(sender, instance, created, **kwargs):
+    action = "Created  Notification" if created else "Updated  Notification"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender= Notification)
+def log_notification_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted  Notification", instance) 
+    
+# -------------------------------
+# Feedback/lms
+# -------------------------------
+@receiver(post_save, sender= Feedback)
+def log_feedback_save(sender, instance, created, **kwargs):
+    action = "Created  Feedback" if created else "Updated  Feedback"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender= Feedback)
+def log_feedback_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted  Feedback", instance) 
+    
+# -------------------------------
+# Bookmark/lms
+# -------------------------------
+@receiver(post_save, sender= Bookmark)
+def log_bookmark_save(sender, instance, created, **kwargs):
+    action = "Created  Bookmark" if created else "Updated  Bookmark"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender= Bookmark)
+def log_bookmark_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted  Bookmark", instance)     
+    
+# -------------------------------
+# Discussion/lms
+# -------------------------------
+@receiver(post_save, sender= Discussion)
+def log_discussion_save(sender, instance, created, **kwargs):
+    action = "Created  Discussion" if created else "Updated  Discussion"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender= Discussion)
+def log_discussion_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted  Discussion", instance) 
+    
+        
+    # -------------------------------
+# schedule/lmsschedule
+# -------------------------------
+@receiver(post_save, sender= Schedule)
+def log_schedule_save(sender, instance, created, **kwargs):
+    action = "Created  schedule" if created else "Updated  schedule"
+    log_action(instance.user, action, instance)
+
+
+@receiver(post_delete, sender= Schedule)
+def log_schedule_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted  schedule", instance) 
     
