@@ -52,40 +52,49 @@ class RegisterView(APIView):
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
+from django.db.models import Q
+
 class LoginView(APIView):
     def post(self, request):
         logger.info("Login API called")
 
-        username = request.data.get("username")
+        login_id = request.data.get("username")  # can be username OR email
         password = request.data.get("password")
-        user = authenticate(request, username=username, password=password)
+        print(login_id, password)
 
-        if user is not None:
+        user = None
+
+        # First try with email (since USERNAME_FIELD = email)
+        user = authenticate(request, username=login_id, password=password)
+
+        # If that failed, try username lookup manually
+        if user is None:
+            try:
+                u = User.objects.get(username=login_id)
+                if u.check_password(password) and u.is_active:
+                    user = u
+            except User.DoesNotExist:
+                pass
+
+        if user:
             login(request, user)
-            logger.info(f"Login successful for user: {username}")
+            logger.info(f"Login successful for user: {user.username}")
 
             recent_log_exists = UserLog.objects.filter(
                 user=user,
-                action='login',
+                action="login",
                 timestamp__gte=timezone.now() - timedelta(seconds=5)
             ).exists()
             if not recent_log_exists:
-                UserLog.objects.create(user=user, action='login', ip_address=get_client_ip(request))
+                UserLog.objects.create(user=user, action="login", ip_address=get_client_ip(request))
 
             token, _ = Token.objects.get_or_create(user=user)
             return Response({"message": "Login successful", "token": token.key}, status=status.HTTP_200_OK)
 
-        logger.warning(f"Invalid login attempt for username: {username}")
+        logger.warning(f"Invalid login attempt for: {login_id}")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-# class UserDetailView(APIView):
-
-#     def get(self, request, pk):
-#         logger.info(f"{request.user.email} fetching user id={pk}")
-#         user_obj = get_object_or_404(User, pk=pk)
-#         serializer = RegisterSerializer(user_obj)
-#         return Response({'data': serializer.data})
 
 class UserDetailView(APIView):
     """

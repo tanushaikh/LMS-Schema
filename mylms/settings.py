@@ -182,3 +182,6 @@ LOGGING = {
         },
     },
 }
+AUTHENTICATION_BACKENDS = [
+    "accounts.backends.UsernameOrEmailBackend",
+]
