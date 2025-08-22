@@ -3,18 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login
-from accounts.serializers import RegisterSerializer, LoginSerializer,PostSerializer,RolePermissionSerializer,PermissionSerializer,RoleSerializer
-from accounts.models import UserLog, User,Post,RolePermission,Role,Permission
+from accounts.serializers import RegisterSerializer, LoginSerializer,PostSerializer,RolePermissionSerializer,PermissionSerializer,RoleSerializer,ProfileSerializer
+from accounts.models import UserLog, User,Post,RolePermission,Role,Permission,Profile
 from datetime import timedelta
 from django.utils import timezone
 import logging
 from rest_framework import viewsets, permissions,status
 from rest_framework.permissions import IsAuthenticated
 from lms.models import *
+from django.db import transaction, DatabaseError
+
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
 
-from django.db import transaction, DatabaseError
 
 def delete_user_safe(user_obj):
     try:
@@ -264,3 +265,15 @@ class PermissionViewSet(viewsets.ModelViewSet):
 class RolePermissionViewSet(viewsets.ModelViewSet):
     queryset = RolePermission.objects.all()
     serializer_class = RolePermissionSerializer
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.AllowAny]   # 🔓 Open access
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.AllowAny] 

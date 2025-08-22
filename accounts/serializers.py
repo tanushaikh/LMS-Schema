@@ -98,3 +98,23 @@ class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RolePermission
         fields = ['id', 'role', 'permission', 'slug', 'role_id', 'permission_id']
+
+# -------------------------------
+#       PROFILE SERIALIZER
+# -------------------------------
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+# -------------------------------
+#       POST SERIALIZER
+# -------------------------------
+
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
