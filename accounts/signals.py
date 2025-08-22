@@ -7,7 +7,7 @@ from courses.models import *
 from achievements.models import *
 from lms.models import *
 from schedule.models import Schedule
-
+from session_lms.models import Session
 from assignments.models import *
 logger = logging.getLogger('lmsapp')
 User = get_user_model()

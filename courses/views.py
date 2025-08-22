@@ -1,9 +1,8 @@
 from rest_framework import viewsets
-from .models import Course, Meeting, Session, CourseEnrollment
+from .models import Course, Meeting, CourseEnrollment
 from .serializers import (
     CourseSerializer,
     MeetingSerializer,
-    SessionSerializer,
     CourseEnrollmentSerializer,
 )
 
