@@ -24,5 +24,8 @@ urlpatterns = [
     path('api/courses/', include('courses.urls')),
     path('api/achievements/', include('achievements.urls')),
     path('api/assignments/', include('assignments.urls')), 
+    path('api/schedule/', include('schedule.urls')), 
+    path('api/sessions/', include('session_lms.urls')), 
+    path('api/lms/', include('lms.urls')), 
 ]
 

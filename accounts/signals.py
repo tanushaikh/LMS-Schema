@@ -102,27 +102,26 @@ def log_submission_delete(sender, instance, **kwargs):
 @receiver(post_save, sender=Course)
 def log_course_save(sender, instance, created, **kwargs):
     action = "Created Course" if created else "Updated Course"
-    log_action(instance.user, action, instance)
+    log_action(instance.created_by, action, instance)
 
 
 @receiver(post_delete, sender=Course)
 def log_course_delete(sender, instance, **kwargs):
-    log_action(instance.user, "Deleted course", instance)
-    
+    log_action(instance.created_by, "Deleted course", instance)
     
     
 # -------------------------------
 # Meeting 
 # -------------------------------
-@receiver(post_save, sender=Course)
-def log_course_save(sender, instance, created, **kwargs):
-    action = "Created Course" if created else "Updated Course"
+@receiver(post_save, sender=Meeting)
+def log_meeting_save(sender, instance, created, **kwargs):
+    action = "Created Meeting" if created else "Updated Meeting"
     log_action(instance.user, action, instance)
 
 
-@receiver(post_delete, sender=Course)
-def log_course_delete(sender, instance, **kwargs):
-    log_action(instance.user, "Deleted course", instance)
+@receiver(post_delete, sender=Meeting)
+def log_meeting_delete(sender, instance, **kwargs):
+    log_action(instance.user, "Deleted Meeting", instance)
     
 
 # -------------------------------
