@@ -3,31 +3,66 @@ from django.contrib.auth import authenticate
 from .models import User, Profile,Post,Role,RolePermission,Permission,UserLog
 
 
+from django.contrib.auth.hashers import make_password
 
 class RegisterSerializer(serializers.ModelSerializer):
+    # Keep temporary raw values
+    raw_password = None
+    raw_confirm_password = None
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'password', 'user_type']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = [
+            'id', 'email', 'username', 'password', 'confirm_password',
+            'user_type', 'first_name', 'last_name', 'learning_goal'
+        ]
+        extra_kwargs = {
+            'password': {'write_only': True},          # don't expose DB hash
+            'confirm_password': {'write_only': True}  # don't expose DB hash
+        }
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError({"password": "Passwords do not match."})
+        return data
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password'],
-            user_type=validated_data['user_type'],
-            is_active=False
-        )
-        return user
-    def update(self, instance, validated_data):
-            password = validated_data.pop('password', None)  # remove password if exists
-            for attr, value in validated_data.items():
-                setattr(instance, attr, value)
-            if password:
-                instance.set_password(password)  # hash password
-            instance.save()
-            return instance
+        # store raw for response
+        self.raw_password = validated_data['password']
+        self.raw_confirm_password = validated_data['confirm_password']
 
+        # hash before saving
+        validated_data['password'] = make_password(validated_data['password'])
+        validated_data['confirm_password'] = make_password(validated_data['confirm_password'])
+
+        user = User.objects.create(**validated_data)
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.get('password', None)
+        confirm_password = validated_data.get('confirm_password', None)
+
+        if password:
+            self.raw_password = password
+            instance.password = make_password(password)
+
+        if confirm_password:
+            self.raw_confirm_password = confirm_password
+            instance.confirm_password = make_password(confirm_password)
+
+        for attr, value in validated_data.items():
+            if attr not in ['password', 'confirm_password']:
+                setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        """Return raw password + confirm_password in API response"""
+        rep = super().to_representation(instance)
+        rep['password'] = self.raw_password if self.raw_password else "******"
+        rep['confirm_password'] = self.raw_confirm_password if self.raw_confirm_password else "******"
+        return rep
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()

@@ -98,7 +98,10 @@ USER_TYPE_CHOICES = (
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)  # re-add username
     email = models.EmailField(unique=True)
-
+    first_name = models.CharField(max_length=255,blank=True,unique=True )
+    last_name = models.CharField(max_length=255,blank=True,unique=True )
+    confirm_password = models.CharField(max_length=255,unique=True )
+    learning_goal = models.CharField(max_length=255,blank=True,unique=True )
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
     is_active = models.BooleanField(default=False)

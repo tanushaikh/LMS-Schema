@@ -14,9 +14,6 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-
-
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseEnrollment

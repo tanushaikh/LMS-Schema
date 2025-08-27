@@ -4,7 +4,21 @@ from django.utils import timezone
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
+    instructor = models.CharField(max_length=200)
+    level  = models.CharField(max_length=200)
+    duration = models.CharField(max_length=200)
+    students = models.CharField(max_length=200)
+    rating = models.CharField(max_length=200)
+    progress = models.CharField(max_length=200)
+    status = models.CharField(max_length=200)
+    price = models.CharField(max_length=200)
+    skills = models.JSONField(default=list)
+    next_lesson = models.CharField(max_length=200)
+    completed_lesson = models.IntegerField()
+    total_lessons = models.IntegerField()
+    certificate_status  = models.BooleanField(default=True)
     description = models.TextField()
+    ai_assisted = models.BooleanField(default=True)
     category = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
     created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='create_course_user')
@@ -13,7 +27,7 @@ class Course(models.Model):
     slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:  # sirf jab slug empty ho tab generate karo
+        if not self.slug:
             base_slug = slugify(self.title)
             unique_slug = base_slug
             counter = 1

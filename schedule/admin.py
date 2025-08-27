@@ -3,7 +3,5 @@ from .models import Schedule
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('user','reminder_time', 'is_notified')
+    list_display = ('user','reminder_time')
     search_fields = ('user__username', 'session__title')
-    list_filter = ('is_notified', 'reminder_time')
-

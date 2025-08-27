@@ -5,8 +5,15 @@ import uuid
 class Achievement(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='ach_Achievement_user')
     title = models.CharField(max_length=200)
+    category = models.CharField(max_length=200)
+    points = models.IntegerField()
+    rarity = models.CharField(max_length=200)
+    is_unlocked = models.BooleanField(default=False)
+    progress = models.IntegerField()
+    requirement = models.CharField(max_length=200)
     description = models.TextField()
     earned_on = models.DateTimeField()
+    unlocked_date = models.DateTimeField()
     icon = models.ImageField(upload_to='achievements/')
     slug = models.SlugField(unique=True, blank=True)
 
