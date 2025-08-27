@@ -10,7 +10,7 @@ class Assignment(models.Model):
     title = models.CharField(max_length=200)
     instructor = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
-    priiority = models.CharField(max_length=200)
+    priority = models.CharField(max_length=200)
     points = models.IntegerField()
     earned_points = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
@@ -22,7 +22,7 @@ class Assignment(models.Model):
     description = models.TextField()
     due_date = models.DateTimeField()
     sumbitted_date = models.DateTimeField()
-    attachments = models.FileField(upload_to='assignments/', null=True, blank=True)
+    attachment= models.FileField(upload_to='assignments/', null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='Assignment_user')
     slug = models.SlugField(unique=True, blank=True, null=True)
 

@@ -7,16 +7,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Assignment
-        fields = [
-            "id",
-            "title",
-            "description",
-            "due_date",
-            "attachment",
-            "created_by",
-            "created_by_username",
-            "slug",
-        ]
+        fields = '__all__'
         read_only_fields = ["slug"]
 
 
