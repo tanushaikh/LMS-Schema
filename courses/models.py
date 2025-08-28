@@ -38,7 +38,7 @@ class Course(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"course {self.created_by.username}"
+        return f"course {self.pk}"
 
 class Meeting(models.Model):
     host = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
