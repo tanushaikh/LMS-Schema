@@ -98,10 +98,10 @@ USER_TYPE_CHOICES = (
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)  # re-add username
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=255,blank=True,unique=True )
-    last_name = models.CharField(max_length=255,blank=True,unique=True )
+    first_name = models.CharField(max_length=255,blank=True)
+    last_name = models.CharField(max_length=255,blank=True)
     confirm_password = models.CharField(max_length=255,unique=True )
-    learning_goal = models.CharField(max_length=255,blank=True,unique=True )
+    learning_goal = models.CharField(max_length=255,blank=True)
     role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
     is_active = models.BooleanField(default=False)
@@ -126,7 +126,7 @@ class User(AbstractUser):
 # PROFILE MODEL
 # -------------------------------
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
+    user = models.OneToOneField(User,  on_delete=models.SET_NULL, null=True, blank=True, related_name='user_profile')
     full_name = models.CharField(max_length=150)
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, blank=True)
@@ -149,7 +149,7 @@ class Profile(models.Model):
 # USER LOG
 # -------------------------------
 class UserLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User,  on_delete=models.SET_NULL, null=True, blank=True)
     action = models.CharField(max_length=255)
     model_name = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -163,7 +163,7 @@ class UserLog(models.Model):
 # POST MODEL (User can create posts/views)
 # -------------------------------
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    user = models.ForeignKey(User,  on_delete=models.SET_NULL, null=True, blank=True, related_name="posts")
     title = models.CharField(max_length=200)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

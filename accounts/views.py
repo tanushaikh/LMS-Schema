@@ -14,6 +14,11 @@ from lms.models import *
 from django.db import transaction, DatabaseError
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from courses.models import *
+from session_lms.models import *
+from schedule.models import *
+from achievements.models import *
+from assignments.models import *
 
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
@@ -54,13 +59,12 @@ class RegisterView(APIView):
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-from django.db.models import Q
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     def post(self, request):
         logger.info("Login API called")
 
-        login_id = request.data.get("username")  # can be username OR email
+        login_id = request.data.get("username")
         password = request.data.get("password")
         print(login_id, password)
 
@@ -123,22 +127,40 @@ class UserDetailView(APIView):
             return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, id):
         user_obj = get_object_or_404(User, id=id)
         user_identifier = user_obj.email or user_obj.username
 
         try:
             with transaction.atomic():
-                # Delete dependent objects
+                # Models with `user`
+                CourseEnrollment.objects.filter(user=user_obj).delete()
+                AITutorInteraction.objects.filter(user=user_obj).delete()
+                Analytics.objects.filter(user=user_obj).delete()
+                Certificate.objects.filter(user=user_obj).delete()
+                Achievement.objects.filter(user=user_obj).delete()
+                Role.objects.filter(user=user_obj).delete()
+                Post.objects.filter(user=user_obj).delete()
+                Certificate.objects.filter(user=user_obj).delete()
+                Assignment.objects.filter(created_by=user_obj).delete()
+                Analytics.objects.filter(user=user_obj).delete()
+
+                Meeting.objects.filter(host=user_obj).delete()
+                Course.objects.filter(created_by=user_obj).delete()
+                Schedule.objects.filter(user=user_obj).delete()
+                Bookmark.objects.filter(user=user_obj).delete()
+                Feedback.objects.filter(user=user_obj).delete()
+                Discussion.objects.filter(user=user_obj).delete()
+
                 user_obj.userlog_set.all().delete()
                 if hasattr(user_obj, 'profile'):
                     user_obj.profile.delete()
-                # Add other dependent deletes here
 
-                # Delete the user
+                # Delete user
                 user_obj.delete()
 
-            # Logging separately (errors here won't affect response)
+            # Logging
             if request.user.is_authenticated and request.user != user_obj:
                 try:
                     UserLog.objects.create(
@@ -152,15 +174,16 @@ class UserDetailView(APIView):
 
             return Response(
                 {'message': f'User {user_identifier} has been successfully deleted.'},
-                status=status.HTTP_204_NO_CONTENT
+                status=status.HTTP_200_OK
             )
 
         except Exception as e:
-            # Only fail if deletion actually fails
             return Response(
                 {'error': f'Failed to delete user: {str(e)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+   
+   
     def soft_delete(self, request, id):
             """
             Soft delete user by setting is_active=False
@@ -189,6 +212,7 @@ class UserDetailView(APIView):
                 {'message': f'User {user_identifier} has been deactivated.'},
                 status=status.HTTP_200_OK
             )
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer

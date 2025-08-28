@@ -11,7 +11,7 @@ from courses.models import Course
 
 # AITutorInteraction
 class AITutorInteraction(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_ai_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='lms_ai_user')
     question = models.TextField()
     ai_response = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
@@ -20,7 +20,7 @@ class AITutorInteraction(models.Model):
 
 # Notification
 class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_notifications_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -29,7 +29,7 @@ class Notification(models.Model):
 
 # Feedback
 class Feedback(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_feedback_user')
+    user = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.TextField()
@@ -38,7 +38,7 @@ class Feedback(models.Model):
 
 # Bookmark
 class Bookmark(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='lms_bookmark_user')
+    user = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     #session = models.ForeignKey(Session, on_delete=models.CASCADE)
     note = models.TextField(blank=True)
     slug = models.SlugField(unique=True)
@@ -46,7 +46,7 @@ class Bookmark(models.Model):
 # Discussion
 class Discussion(models.Model):
     #session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='discussion_user')
+    user = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     message = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True)

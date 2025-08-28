@@ -23,7 +23,7 @@ class Assignment(models.Model):
     due_date = models.DateTimeField()
     sumbitted_date = models.DateTimeField()
     attachment= models.FileField(upload_to='assignments/', null=True, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='Assignment_user')
+    created_by = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
     # def save(self, *args, **kwargs):
@@ -36,12 +36,12 @@ class Assignment(models.Model):
 
 class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='AssignmentSubmission_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     submission_file = models.FileField(upload_to='submissions/')
     submitted_at = models.DateTimeField(default=timezone.now)
     grade = models.CharField(max_length=10, blank=True)
     feedback = models.TextField(blank=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)  # ✅ fix
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -1,12 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User, Profile,Post,Role,RolePermission,Permission,UserLog
-
-
 from django.contrib.auth.hashers import make_password
 
 class RegisterSerializer(serializers.ModelSerializer):
-    # Keep temporary raw values
     raw_password = None
     raw_confirm_password = None
 
@@ -17,9 +14,27 @@ class RegisterSerializer(serializers.ModelSerializer):
             'user_type', 'first_name', 'last_name', 'learning_goal'
         ]
         extra_kwargs = {
-            'password': {'write_only': True},          # don't expose DB hash
-            'confirm_password': {'write_only': True}  # don't expose DB hash
+            'password': {'write_only': True},
+            'confirm_password': {'write_only': True}
         }
+
+    def validate_first_name(self, value):
+        """Ensure first_name is unique"""
+        if User.objects.filter(first_name=value).exists():
+            raise serializers.ValidationError("This first name is already taken.")
+        return value
+
+    def validate_last_name(self, value):
+        """Ensure last_name is unique"""
+        if User.objects.filter(last_name=value).exists():
+            raise serializers.ValidationError("This last name is already taken.")
+        return value
+
+    def validate_learning_goal(self, value):
+        """Ensure learning_goal is unique"""
+        if User.objects.filter(learning_goal=value).exists():
+            raise serializers.ValidationError("This learning goal is already taken.")
+        return value
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -27,20 +42,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        # store raw for response
         self.raw_password = validated_data['password']
         self.raw_confirm_password = validated_data['confirm_password']
 
-        # hash before saving
         validated_data['password'] = make_password(validated_data['password'])
         validated_data['confirm_password'] = make_password(validated_data['confirm_password'])
 
-        user = User.objects.create(**validated_data)
-        return user
+        return User.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        password = validated_data.get('password', None)
-        confirm_password = validated_data.get('confirm_password', None)
+        password = validated_data.get('password')
+        confirm_password = validated_data.get('confirm_password')
 
         if password:
             self.raw_password = password
@@ -58,7 +70,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        """Return raw password + confirm_password in API response"""
         rep = super().to_representation(instance)
         rep['password'] = self.raw_password if self.raw_password else "******"
         rep['confirm_password'] = self.raw_confirm_password if self.raw_confirm_password else "******"

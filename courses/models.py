@@ -21,7 +21,7 @@ class Course(models.Model):
     ai_assisted = models.BooleanField(default=True)
     category = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
-    created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='create_course_user')
+    created_by = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, blank=True)
@@ -41,7 +41,7 @@ class Course(models.Model):
         return f"course {self.created_by.username}"
 
 class Meeting(models.Model):
-    host = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='meetings_hosted')
+    host = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     meeting_link = models.URLField()
     platform = models.CharField(max_length=100)
@@ -58,7 +58,7 @@ class Meeting(models.Model):
 
 
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='course_enr_user')
+    user = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)

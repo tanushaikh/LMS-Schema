@@ -3,7 +3,7 @@ from django.utils.text import slugify
 import uuid
 
 class Achievement(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='ach_Achievement_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=200)
     points = models.IntegerField()
@@ -29,14 +29,14 @@ class Achievement(models.Model):
         super().save(*args, **kwargs)
 
 class Certificate(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='ach_Certificate_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
     issued_on = models.DateTimeField()
     certificate_file = models.FileField(upload_to='certificates/')
     slug = models.SlugField(unique=True)
 
 class Analytics(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='ach_analytics_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
     progress_percent = models.FloatField()
     sessions_completed = models.IntegerField()

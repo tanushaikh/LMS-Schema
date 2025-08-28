@@ -3,8 +3,9 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.conf import settings
 from session_lms.models import Session
+
 class Schedule(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     reminder = models.CharField(max_length=255)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
