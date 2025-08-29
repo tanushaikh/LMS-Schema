@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
-
+from accounts.models import User
 class Course(models.Model):
     title = models.CharField(max_length=200)
     instructor = models.CharField(max_length=200)

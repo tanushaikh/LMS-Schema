@@ -163,7 +163,7 @@ class UserLog(models.Model):
 # POST MODEL (User can create posts/views)
 # -------------------------------
 class Post(models.Model):
-    user = models.ForeignKey(User,  on_delete=models.SET_NULL, null=True, blank=True, related_name="posts")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True,  null=True, related_name="posts")
     title = models.CharField(max_length=200)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

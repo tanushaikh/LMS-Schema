@@ -19,10 +19,13 @@ from session_lms.models import *
 from schedule.models import *
 from achievements.models import *
 from assignments.models import *
+from django.contrib.admin.models import LogEntry
+from rest_framework.authtoken.models import Token
+from accounts.models import UserLog
+from django.db import connection
 
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
-
 
 def delete_user_safe(user_obj):
     try:
@@ -34,7 +37,6 @@ def delete_user_safe(user_obj):
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     return x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
-
 
 class RegisterView(APIView):
     def get(self, request):
@@ -57,7 +59,6 @@ class RegisterView(APIView):
 
             return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
@@ -98,7 +99,7 @@ class LoginView(APIView):
         logger.warning(f"Invalid login attempt for: {login_id}")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
+from accounts.utils import safe_delete_user
 class UserDetailView(APIView):
     """
     Update, delete, or soft-delete user by ID.
@@ -128,90 +129,17 @@ class UserDetailView(APIView):
 
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, id):
-        user_obj = get_object_or_404(User, id=id)
-        user_identifier = user_obj.email or user_obj.username
+    def delete(self, request, pk):
+        """
+        DELETE /api/users/<id>/safe_delete/
+        """
+        result = safe_delete_user(pk)
 
-        try:
-            with transaction.atomic():
-                # Models with `user`
-                CourseEnrollment.objects.filter(user=user_obj).delete()
-                AITutorInteraction.objects.filter(user=user_obj).delete()
-                Analytics.objects.filter(user=user_obj).delete()
-                Certificate.objects.filter(user=user_obj).delete()
-                Achievement.objects.filter(user=user_obj).delete()
-                Role.objects.filter(user=user_obj).delete()
-                Post.objects.filter(user=user_obj).delete()
-                Certificate.objects.filter(user=user_obj).delete()
-                Assignment.objects.filter(created_by=user_obj).delete()
-                Analytics.objects.filter(user=user_obj).delete()
+        if result.startswith("✅"):
+            return Response({"message": result}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": result}, status=status.HTTP_404_NOT_FOUND)
 
-                Meeting.objects.filter(host=user_obj).delete()
-                Course.objects.filter(created_by=user_obj).delete()
-                Schedule.objects.filter(user=user_obj).delete()
-                Bookmark.objects.filter(user=user_obj).delete()
-                Feedback.objects.filter(user=user_obj).delete()
-                Discussion.objects.filter(user=user_obj).delete()
-
-                user_obj.userlog_set.all().delete()
-                if hasattr(user_obj, 'profile'):
-                    user_obj.profile.delete()
-
-                # Delete user
-                user_obj.delete()
-
-            # Logging
-            if request.user.is_authenticated and request.user != user_obj:
-                try:
-                    UserLog.objects.create(
-                        user=request.user,
-                        action=f'delete_user: {user_identifier}',
-                        model_name='User',
-                        ip_address=get_client_ip(request)
-                    )
-                except Exception:
-                    pass
-
-            return Response(
-                {'message': f'User {user_identifier} has been successfully deleted.'},
-                status=status.HTTP_200_OK
-            )
-
-        except Exception as e:
-            return Response(
-                {'error': f'Failed to delete user: {str(e)}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-   
-   
-    def soft_delete(self, request, id):
-            """
-            Soft delete user by setting is_active=False
-            """
-            user_obj = get_object_or_404(User, id=id)
-            user_identifier = user_obj.email or user_obj.username
-
-            user_obj.is_active = False
-            user_obj.save()
-
-            if request.user.is_authenticated and request.user != user_obj:
-                recent_log_exists = UserLog.objects.filter(
-                    user=request.user,
-                    action='soft_delete_user',
-                    timestamp__gte=timezone.now() - timedelta(seconds=5)
-                ).exists()
-                if not recent_log_exists:
-                    UserLog.objects.create(
-                        user=request.user,
-                        action=f'soft_delete_user: {user_identifier}',
-                        model_name='User',
-                        ip_address=get_client_ip(request)
-                    )
-
-            return Response(
-                {'message': f'User {user_identifier} has been deactivated.'},
-                status=status.HTTP_200_OK
-            )
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -228,14 +156,12 @@ class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
 
-
 # -------------------------------
 # PERMISSION VIEWSET
 # -------------------------------
 class PermissionViewSet(viewsets.ModelViewSet):
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
-
 
 # -------------------------------
 # ROLE PERMISSION VIEWSET
@@ -244,12 +170,10 @@ class RolePermissionViewSet(viewsets.ModelViewSet):
     queryset = RolePermission.objects.all()
     serializer_class = RolePermissionSerializer
 
-
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.AllowAny]   # 🔓 Open access
-
+    permission_classes = [permissions.AllowAny]
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()

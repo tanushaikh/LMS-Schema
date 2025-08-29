@@ -198,3 +198,5 @@ APPEND_SLASH=True
 AUTHENTICATION_BACKENDS = [
     "accounts.backends.UsernameOrEmailBackend",
 ]
+
+AUTH_TOKEN_MODEL = "accounts.CustomToken"

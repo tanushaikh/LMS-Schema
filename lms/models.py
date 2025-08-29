@@ -11,7 +11,7 @@ from courses.models import Course
 
 # AITutorInteraction
 class AITutorInteraction(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE,related_name='lms_ai_user')
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL,null=True, blank=True,related_name='lms_ai_user')
     question = models.TextField()
     ai_response = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
