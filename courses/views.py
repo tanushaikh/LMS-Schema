@@ -6,6 +6,7 @@ from .serializers import (
     MeetingSerializer,
     CourseEnrollmentSerializer,
 )
+from rest_framework import status
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
