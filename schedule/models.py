@@ -1,8 +1,6 @@
 from django.db import models
-from django.utils import timezone
 from django.utils.text import slugify
 from django.conf import settings
-from session_lms.models import Session
 
 class Schedule(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
@@ -19,11 +17,9 @@ class Schedule(models.Model):
     color = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
-    title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.user.username}-{self.reminder_time}")
         super().save(*args, **kwargs)
-
