@@ -1,18 +1,19 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
-from accounts.models import User
+
 class Course(models.Model):
     title = models.CharField(max_length=200)
     instructor = models.CharField(max_length=200)
     level  = models.CharField(max_length=200)
-    duration = models.CharField(max_length=200)
+    duration_minutes = models.IntegerField(default=0)  # store duration in minutes
     students = models.CharField(max_length=200)
     rating = models.CharField(max_length=200)
     progress = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
     price = models.CharField(max_length=200)
     skills = models.JSONField(default=list)
+    score = models.FloatField()
     next_lesson = models.CharField(max_length=200)
     completed_lesson = models.IntegerField()
     total_lessons = models.IntegerField()

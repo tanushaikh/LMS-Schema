@@ -23,6 +23,7 @@ from django.contrib.admin.models import LogEntry
 from rest_framework.authtoken.models import Token
 from accounts.models import UserLog
 from django.db import connection
+from accounts.utils import safe_delete_user
 
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
@@ -99,7 +100,6 @@ class LoginView(APIView):
         logger.warning(f"Invalid login attempt for: {login_id}")
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-from accounts.utils import safe_delete_user
 class UserDetailView(APIView):
     """
     Update, delete, or soft-delete user by ID.

@@ -11,6 +11,7 @@ class Session(models.Model):
     duration = models.CharField(max_length=200)
     participants = models.IntegerField()
     max_participants = models.IntegerField()
+    ratings = models.IntegerField()
     status = models.CharField(max_length=200)
     course_title = models.CharField(max_length=200)
     topics = models.JSONField(default=list)

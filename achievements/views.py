@@ -1,13 +1,20 @@
 from rest_framework import viewsets
 from .models import Achievement, Certificate, Analytics
 from .serializers import AchievementSerializer, CertificateSerializer, AnalyticsSerializer
-
-
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import action
 class AchievementViewSet(viewsets.ModelViewSet):
     queryset = Achievement.objects.all().order_by("-earned_on")
     serializer_class = AchievementSerializer
     permission_classes = []  # 🔓 No auth required
-
+    @action(detail=False, methods=["get"], url_path="total")
+    def total_achievement(self, request):
+        total = Achievement.objects.count()
+        return Response(
+            {"total_achievement": total},
+            status=status.HTTP_200_OK
+        )
 
 class CertificateViewSet(viewsets.ModelViewSet):
     queryset = Certificate.objects.all().order_by("-issued_on")
