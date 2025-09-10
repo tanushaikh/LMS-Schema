@@ -19,7 +19,3 @@ class Schedule(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.user.username}-{self.reminder_time}")
-        super().save(*args, **kwargs)

@@ -4,14 +4,13 @@ from django.utils.text import slugify
 
 
 class Session(models.Model):
-    # course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     instructor = models.CharField(max_length=200)
     instructor_avatar = models.CharField(max_length=200)
     duration = models.CharField(max_length=200)
     participants = models.IntegerField()
     max_participants = models.IntegerField()
-    ratings = models.IntegerField()
     status = models.CharField(max_length=200)
     course_title = models.CharField(max_length=200)
     topics = models.JSONField(default=list)
