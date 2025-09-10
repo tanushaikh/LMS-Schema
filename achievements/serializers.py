@@ -7,16 +7,7 @@ class AchievementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Achievement
-        fields = [
-            "id",
-            "user",
-            "user_username",
-            "title",
-            "description",
-            "earned_on",
-            "icon",
-            "slug",
-        ]
+        fields = "__all__"
         read_only_fields = ["slug"]
 
 
