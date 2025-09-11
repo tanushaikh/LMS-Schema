@@ -1,0 +1,2169 @@
+{
+	"info": {
+		"_postman_id": "38bf1552-0761-48a1-a6db-9f56b563d8a6",
+		"name": "LMS Complete API Collection",
+		"description": "Complete collection of all LMS APIs including Achievements, Assignments, Courses, User Management, and more",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30543067"
+	},
+	"item": [
+		{
+			"name": "Achievements API",
+			"item": [
+				{
+					"name": "Get All Achievements",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/achievements/achievements/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"achievements",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Achievement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Top Scorer",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Scored highest in course",
+									"type": "text"
+								},
+								{
+									"key": "earned_on",
+									"value": "2025-08-20T10:00:00Z",
+									"type": "text"
+								},
+								{
+									"key": "icon",
+									"type": "file",
+									"src": "postman-cloud:///1eec4528-9e82-4980-9669-b6014902665c"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/achievements/achievements/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"achievements",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Achievement",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "icon",
+									"type": "file",
+									"src": "postman-cloud:///1eec4528-9e82-4980-9669-b6014902665c"
+								},
+								{
+									"key": "user",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "earned_on",
+									"value": "2025-08-20T10:00:00Z",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "demo",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "demo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/achievements/achievements/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"achievements",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Achievement",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/achievements/achievements/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"achievements",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Certificates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/achievements/certificates/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"certificates",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Certificate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "course",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "issued_on",
+									"value": "2025-08-20T12:00:00Z",
+									"type": "text"
+								},
+								{
+									"key": "certificate_file",
+									"type": "file",
+									"src": "postman-cloud:///1eec4528-9e82-4980-9669-b6014902665c"
+								},
+								{
+									"key": "slug",
+									"value": "ds",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/achievements/certificates/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"certificates",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/achievements/analytics/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"analytics",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Analytics",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": 2,\n  \"course\": 1,\n  \"progress_percent\": 80.5,\n  \"sessions_completed\": 12,\n  \"last_active\": \"2025-08-19T08:30:00Z\",\n  \"slug\":\"CS\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/achievements/analytics/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"achievements",
+								"analytics",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Average Score",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Assignment API",
+			"item": [
+				{
+					"name": "Get All Assignments",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"assignments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Assignment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Math Assignment 1\",\n  \"description\": \"Solve all problems\",\n  \"due_date\": \"2025-08-25T10:00:00Z\",\n  \"created_by\":2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/assignments/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"assignments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Assignment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Math Assignment\",\n  \"description\": \"Updated problems\",\n  \"due_date\": \"2025-08-30T10:00:00Z\",\n  \"created_by\":2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/assignments/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"assignments",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Assignment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/assignments/assignments/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"assignments",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Submissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/assignments/submissions/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"submissions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Submission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "assignment",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "submission_file",
+									"type": "file",
+									"src": "/D:/Project/LMS-Schema/assignment_api.postman_collection.json"
+								},
+								{
+									"key": "user",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/submissions/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"submissions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Submission (Grade/Feedback)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"grade\": \"A+\",\n  \"feedback\": \"Excellent work\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/submissions/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"submissions",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Submission",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/assignments/submissions/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"submissions",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Assigenments Counts",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LMS API Full CRUD",
+			"item": [
+				{
+					"name": "AITutorInteractions",
+					"item": [
+						{
+							"name": "Get All Interactions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/lms/ai-interactions/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"lms",
+										"ai-interactions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Interaction",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"user\":1,\"question\":\"What is Django?\",\"ai_response\":\"Django is a Python web framework\",\"slug\":\"interaction-1\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/lms/ai-interactions/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"lms",
+										"ai-interactions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Interaction",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"question\":\"Updated question\",\"ai_response\":\"Updated response\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/ai-interactions/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"ai-interactions",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Interaction",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/ai-interactions/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"ai-interactions",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Notifications",
+					"item": [
+						{
+							"name": "Get All Notifications",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/notifications/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"notifications",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Notification",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"user\":1,\"title\":\"New Update\",\"message\":\"You have a new notification\",\"slug\":\"notif-1\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/notifications/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"notifications",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Notification",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"title\":\"Updated Title\",\"message\":\"Updated message\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/notifications/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"notifications",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Notification",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/notifications/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"notifications",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Feedbacks",
+					"item": [
+						{
+							"name": "Get All Feedbacks",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/feedbacks/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"feedbacks",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Feedback",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"user\":1,\"course\":1,\"rating\":5,\"comment\":\"Great course!\",\"slug\":\"feedback-1\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/feedbacks/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"feedbacks",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Feedback",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"rating\":4,\"comment\":\"Updated comment\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/feedbacks/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"feedbacks",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Feedback",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/feedbacks/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"feedbacks",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Bookmarks",
+					"item": [
+						{
+							"name": "Get All Bookmarks",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/bookmarks/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"bookmarks",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Bookmark",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"user\":1,\"note\":\"Important note\",\"slug\":\"bookmark-1\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/bookmarks/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"bookmarks",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Bookmark",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"note\":\"Updated note\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/bookmarks/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"bookmarks",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Bookmark",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/bookmarks/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"bookmarks",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Discussions",
+					"item": [
+						{
+							"name": "Get All Discussions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/discussions/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"discussions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Discussion",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"user\":1,\"message\":\"Discussion message\",\"slug\":\"discussion-1\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/discussions/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"discussions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Discussion",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"message\":\"Updated discussion message\"}"
+								},
+								"url": {
+									"raw": "http://localhost:8000/api/discussions/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"discussions",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Discussion",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/api/discussions/1/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"discussions",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "LMS Course API",
+			"item": [
+				{
+					"name": "Courses",
+					"item": [
+						{
+							"name": "List Courses",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/courses/courses/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"courses",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Course",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Python Basics\",\n  \"description\": \"Intro course\",\n  \"category\": \"Programming\",\n  \"user\": 1,\n  \"is_published\": true,\n  \"created_by\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/courses/courses/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"courses",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Course",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Updated Python Course\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/courses/courses/1/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"courses",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Course",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/courses/courses/1/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"courses",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Average Learning Time",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Average Score",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "List Courses counts",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Meetings",
+					"item": [
+						{
+							"name": "List Meetings",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/courses/meetings/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"meetings",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Sessions",
+					"item": [
+						{
+							"name": "List Sessions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/sessions/sessions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"sessions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Session",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Django\",\r\n    \"content\": \" We focus on sessions and schedule app\",\r\n    \"start_time\": \"2025-08-23T10:10:10\",\r\n    \"end_time\": \"2025-08-23T10:10:10\",\r\n    \"recording_url\": \"http://example.com\",\r\n    \"slug\": \"tamil\",\r\n    \"user\":2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/sessions/sessions/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"sessions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Session",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Django\",\r\n    \"content\": \" We focus on sessions and schedule app\",\r\n    \"start_time\": \"2025-08-23T10:10:10\",\r\n    \"end_time\": \"2025-08-23T10:10:10\",\r\n    \"recording_url\": \"http://example.com\",\r\n    \"slug\": \"hindi\",\r\n    \"user\":2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/sessions/sessions/2/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"sessions",
+										"2",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Session",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/sessions/sessions/2/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"sessions",
+										"sessions",
+										"2",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Enrollments",
+					"item": [
+						{
+							"name": "List Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/courses/enrollments/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"enrollments",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Enrollments",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Django\",\r\n    \"content\": \" We focus on sessions and schedule app\",\r\n    \"start_time\": \"2025-08-23T10:10:10\",\r\n    \"end_time\": \"2025-08-23T10:10:10\",\r\n    \"recording_url\": \"http://example.com\",\r\n    \"slug\": \"hindi\",\r\n    \"user\":2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/courses/enrollments/2/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"enrollments",
+										"2",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Enrollments",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/courses/enrollments/2/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"courses",
+										"enrollments",
+										"2",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Schedule",
+					"item": [
+						{
+							"name": "Get Schedules",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/schedule/schedules/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"schedule",
+										"schedules",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Schedule",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \"reminder_time\": \"2025-08-23T10:10:10\",\r\n    \"user\":1\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/schedule/schedules/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"schedule",
+										"schedules",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Schedule",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n    \"reminder_time\": \"2025-08-23T10:10:10\",\r\n    \"user\":1\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/schedule/schedules/1/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"schedule",
+										"schedules",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Schedule",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/schedule/schedules/1/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"schedule",
+										"schedules",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "LMS User Management API",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"vicky@example.com\",\n    \"username\": \"vicky\",\n    \"password\": \"00000000\",\n    \"user_type\": \"student\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/register/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users (Register GET)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/register/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Token cef8623a6f4af82a175ba8456662ba081bb3bfbe"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"updated@example.com\",\n    \"username\": \"updateduser\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/users/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"users",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/users/1/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"users",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/users/1/soft_delete/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"users",
+								"1",
+								"soft_delete",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile & Post API",
+			"item": [
+				{
+					"name": "List Profiles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/profiles/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"profiles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"John Doe\",\n  \"age\": 30,\n  \"gender\": \"Male\",\n  \"bio\": \"Hello!\",\n  \"mobile\": \"1234567890\",\n  \"country\": \"India\",\n  \"user\":2\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/profiles/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"profiles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/posts/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"My First Post\",\n  \"content\": \"This is a test post.\",\n  \"user\":2\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/accounts/posts/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"accounts",
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RBAC API Collection",
+			"item": [
+				{
+					"name": "Roles",
+					"item": [
+						{
+							"name": "Create Role",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Admin\",\n  \"description\": \"Administrator role\"\n}"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/account/roles/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"account",
+										"roles",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Roles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/roles/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"roles",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Role by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/roles/1/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"roles",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Role",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Manager\",\n  \"description\": \"Manager role\",\n  \"slug\": \"en\"\n}"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/roles/1/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"roles",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Role",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:8000/roles/1/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"roles",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Permissions",
+					"item": [
+						{
+							"name": "Create Permission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"app_label\": \"users\",\n  \"model_name\": \"user\",\n  \"permission_type\": \"view\",\n  \"slug\":\"en\"\n}"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/permissions/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"permissions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Permissions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/permissions/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"permissions",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RolePermissions",
+					"item": [
+						{
+							"name": "Assign Permission to Role",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"role_id\": 1,\n  \"permission_id\": 1,\n  \"slug\":\"en\"\n}"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/role-permissions/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"role-permissions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List RolePermissions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/accounts/role-permissions/",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"accounts",
+										"role-permissions",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "default"
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
