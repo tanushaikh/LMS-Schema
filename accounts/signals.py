@@ -116,13 +116,13 @@ def log_course_delete(sender, instance, **kwargs):
 @receiver(post_save, sender=Meeting)
 def log_meeting_save(sender, instance, created, **kwargs):
     action = "Created Meeting" if created else "Updated Meeting"
-    log_action(instance.user, action, instance)
-
+    if instance.host:  # check host exists
+        log_action(instance.host, action, instance)
 
 @receiver(post_delete, sender=Meeting)
 def log_meeting_delete(sender, instance, **kwargs):
-    log_action(instance.user, "Deleted Meeting", instance)
-    
+    if instance.host:
+        log_action(instance.host, "Deleted Meeting", instance)
 
 # -------------------------------
 # Session

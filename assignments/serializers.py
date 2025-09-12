@@ -9,7 +9,9 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = "__all__"
         read_only_fields = ["slug"]
-
+        extra_kwargs = {
+            "course": {"required": False, "allow_null": True}  # ✅ course optional
+        }
 
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     assignment_title = serializers.ReadOnlyField(source="assignment.title")
@@ -17,16 +19,9 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AssignmentSubmission
-        fields = [
-            "id",
-            "assignment",
-            "assignment_title",
-            "user",
-            "user_username",
-            "submission_file",
-            "submitted_at",
-            "grade",
-            "feedback",
-            "slug",
-        ]
+        fields = "__all__"
         read_only_fields = ["slug", "submitted_at"]
+        extra_kwargs = {
+            'assignment': {'required': False},
+            'submission_file': {'required': False},
+        }

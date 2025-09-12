@@ -1,20 +1,22 @@
 from django.db import models
 from django.utils.text import slugify
-import uuid
 
 class Achievement(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
-    title = models.CharField(max_length=200)
-    category = models.CharField(max_length=200)
-    points = models.IntegerField()
-    rarity = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)  # required
+
+    # optional fields
+    category = models.CharField(max_length=200, blank=True, null=True)
+    points = models.IntegerField(blank=True, null=True)
+    rarity = models.CharField(max_length=200, blank=True, null=True)
     is_unlocked = models.BooleanField(default=False)
-    progress = models.IntegerField()
-    requirement = models.CharField(max_length=200)
-    description = models.TextField()
-    earned_on = models.DateTimeField()
-    unlocked_date = models.DateTimeField()
-    icon = models.ImageField(upload_to='achievements/')
+    progress = models.IntegerField(blank=True, null=True)
+    requirement = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    earned_on = models.DateTimeField(blank=True, null=True)
+    unlocked_date = models.DateTimeField(blank=True, null=True)
+    icon = models.ImageField(upload_to='achievements/', blank=True, null=True)
+
     slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -28,17 +30,19 @@ class Achievement(models.Model):
             self.slug = unique_slug
         super().save(*args, **kwargs)
 
+
 class Certificate(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
-    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
-    issued_on = models.DateTimeField()
-    certificate_file = models.FileField(upload_to='certificates/')
-    slug = models.SlugField(unique=True)
+    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE, null=True, blank=True)
+    issued_on = models.DateTimeField(blank=True, null=True)
+    certificate_file = models.FileField(upload_to='certificates/', blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True)
+
 
 class Analytics(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
-    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
-    progress_percent = models.FloatField()
-    sessions_completed = models.IntegerField()
-    last_active = models.DateTimeField()
-    slug = models.SlugField(unique=True)
+    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE, null=True, blank=True)
+    progress_percent = models.FloatField(blank=True, null=True)
+    sessions_completed = models.IntegerField(blank=True, null=True)
+    last_active = models.DateTimeField(blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True)
