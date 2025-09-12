@@ -3,7 +3,7 @@ from .models import Achievement, Certificate, Analytics
 
 @admin.register(Achievement)
 class AchievementAdmin(admin.ModelAdmin):
-    list_display = ('user', 'title', 'earned_on')
+    list_display = ('user', 'title', 'earned_on','points')
     search_fields = ('title', 'user__username')
     list_filter = ('earned_on',)
 
