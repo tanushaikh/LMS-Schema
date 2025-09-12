@@ -18,4 +18,5 @@ class Schedule(models.Model):
     status = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    
 

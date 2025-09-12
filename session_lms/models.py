@@ -28,6 +28,14 @@ class Session(models.Model):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
+        # ✅ Change kiya gaya hai: slug ko unique banane ka logic add kiya
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Session.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
         super().save(*args, **kwargs)
