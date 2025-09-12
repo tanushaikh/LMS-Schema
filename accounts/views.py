@@ -178,4 +178,26 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny] 
+    permission_classes = [permissions.AllowAny]
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        Token.objects.filter(user=user).delete()
+
+        recent_log_exists = UserLog.objects.filter(
+            user=user,
+            action="logout",
+            timestamp__gte=timezone.now() - timedelta(seconds=5)
+        ).exists()
+        if not recent_log_exists:
+            UserLog.objects.create(
+                user=user,
+                action="logout",
+                ip_address=get_client_ip(request)
+            )
+
+        return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
