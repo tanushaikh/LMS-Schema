@@ -7,6 +7,7 @@ from accounts.models import User
 from .models import Course, Meeting, CourseEnrollment
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
 
+
 # -------------------------------
 # COURSE VIEWSET
 # -------------------------------
@@ -16,8 +17,11 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response({"message": "Course deleted successfully"}, status=status.HTTP_200_OK)
+        try:
+            self.perform_destroy(instance)
+            return Response({"message": "Course deleted successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"], url_path="total")
     def total_courses(self, request):
@@ -47,8 +51,11 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response({"message": "Meeting deleted successfully"}, status=status.HTTP_200_OK)
+        try:
+            self.perform_destroy(instance)
+            return Response({"message": "Meeting deleted successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
@@ -71,10 +78,12 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response({"message": "Course enrollment deleted successfully"}, status=status.HTTP_200_OK)
+        try:
+            self.perform_destroy(instance)
+            return Response({"message": "Course enrollment deleted successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    # frontend se user field check hata diya
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -3,6 +3,9 @@ from django.utils.text import slugify
 from django.utils import timezone
 import uuid
 
+# -------------------------------
+# COURSE MODEL
+# -------------------------------
 class Course(models.Model):
     title = models.CharField(max_length=200)
     instructor = models.CharField(max_length=200, null=True, blank=True)
@@ -43,7 +46,17 @@ class Course(models.Model):
         return f"course {self.pk}"
 
 
+# -------------------------------
+# MEETING MODEL
+# -------------------------------
 class Meeting(models.Model):
+    # 🔥 CHANGE: Ab Meeting ek Course se linked hai
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,   # agar course delete hoga to meetings bhi delete ho jaye
+        related_name="meetings",
+        null=True, blank=True
+    )
     host = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     meeting_link = models.URLField(null=True, blank=True)
@@ -61,6 +74,9 @@ class Meeting(models.Model):
         super().save(*args, **kwargs)
 
 
+# -------------------------------
+# COURSE ENROLLMENT MODEL
+# -------------------------------
 class CourseEnrollment(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
