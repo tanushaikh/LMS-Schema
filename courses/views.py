@@ -8,9 +8,8 @@ from .models import Course, Meeting, CourseEnrollment
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
 
 
-# -------------------------------
-# COURSE VIEWSET
-# -------------------------------
+
+
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -19,9 +18,20 @@ class CourseViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         try:
             self.perform_destroy(instance)
-            return Response({"message": "Course deleted successfully"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Course deleted successfully"},
+                status=status.HTTP_200_OK
+            )
+        except IntegrityError as e:
+            return Response(
+                {"error": "Cannot delete this course because it has related objects (Meetings/Enrollments)."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=False, methods=["get"], url_path="total")
     def total_courses(self, request):
@@ -40,7 +50,6 @@ class CourseViewSet(viewsets.ModelViewSet):
         hours = int(avg_minutes // 60)
         minutes = int(avg_minutes % 60)
         return Response({"average_learning_time": f"{hours}h {minutes}m"}, status=status.HTTP_200_OK)
-
 
 # -------------------------------
 # MEETING VIEWSET

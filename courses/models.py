@@ -53,9 +53,9 @@ class Meeting(models.Model):
     # 🔥 CHANGE: Ab Meeting ek Course se linked hai
     course = models.ForeignKey(
         Course,
-        on_delete=models.CASCADE,   # agar course delete hoga to meetings bhi delete ho jaye
-        related_name="meetings",
-        null=True, blank=True
+        on_delete=models.CASCADE,  
+        related_name="meetings",null=True, 
+    blank=True
     )
     host = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
@@ -79,10 +79,10 @@ class Meeting(models.Model):
 # -------------------------------
 class CourseEnrollment(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,related_name="enrollments",null=True,blank=True)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)     
     
     def save(self, *args, **kwargs):
         if not self.slug:
