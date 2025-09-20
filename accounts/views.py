@@ -24,6 +24,8 @@ from rest_framework.authtoken.models import Token
 from accounts.models import UserLog
 from django.db import connection
 from accounts.utils import safe_delete_user
+from .permissions import HasModelPermission
+from rest_framework_simplejwt.tokens import RefreshToken
 
 logger = logging.getLogger('lmsapp')
 User = get_user_model()
@@ -41,64 +43,49 @@ def get_client_ip(request):
 
 class RegisterView(APIView):
     def get(self, request):
-        user_obj = User.objects.all()
-        serializer = RegisterSerializer(user_obj, many=True)
-        return Response({'data': serializer.data})
+        users = User.objects.all()
+        serializer = RegisterSerializer(users, many=True)
+        return Response({"data": serializer.data})
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
 
-            # Avoid duplicate logs
-            recent_log_exists = UserLog.objects.filter(
-                user=user, action='register',
-                timestamp__gte=timezone.now() - timedelta(seconds=5)
-            ).exists()
-            if not recent_log_exists:
-                UserLog.objects.create(user=user, action='register', ip_address=get_client_ip(request))
+            UserLog.objects.create(user=user, action="register", ip_address=get_client_ip(request))
 
-            return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from accounts.serializers import PermissionSerializer
+
+@method_decorator(csrf_exempt, name="dispatch")
 class LoginView(APIView):
     def post(self, request):
-        logger.info("Login API called")
-
         login_id = request.data.get("username")
         password = request.data.get("password")
-        print(login_id, password)
-
-        user = None
 
         user = authenticate(request, username=login_id, password=password)
+        if not user:
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if user is None:
-            try:
-                u = User.objects.get(username=login_id)
-                if u.check_password(password) and u.is_active:
-                    user = u
-            except User.DoesNotExist:
-                pass
+        login(request, user)
+        refresh = RefreshToken.for_user(user)
 
-        if user:
-            login(request, user)
-            logger.info(f"Login successful for user: {user.username}")
+        if not user.role:
+            return Response({"error": "User does not have a role assigned"}, status=status.HTTP_400_BAD_REQUEST)
 
-            recent_log_exists = UserLog.objects.filter(
-                user=user,
-                action="login",
-                timestamp__gte=timezone.now() - timedelta(seconds=5)
-            ).exists()
-            if not recent_log_exists:
-                UserLog.objects.create(user=user, action="login", ip_address=get_client_ip(request))
+        role_permissions = RolePermission.objects.filter(role=user.role).select_related("permission")
 
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({"message": "Login successful", "token": token.key}, status=status.HTTP_200_OK)
-
-        logger.warning(f"Invalid login attempt for: {login_id}")
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({
+            "message": "Login successful",
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "role": user.role.name,
+            "permissions": [rp.permission.slug for rp in role_permissions],
+        }, status=status.HTTP_200_OK)
 
 class UserDetailView(APIView):
     """
@@ -144,10 +131,29 @@ class UserDetailView(APIView):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasModelPermission]
+
+    app_label = "accounts"
+    model_name = "post"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
 # -------------------------------
 # ROLE VIEWSET
@@ -175,10 +181,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.AllowAny]
 
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny]
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]

@@ -2,7 +2,7 @@ from django.contrib.admin.models import LogEntry
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.db import transaction, connection
-
+from .models import RolePermission
 def has_permission(user, app_model, action):
     if not user.role:
         return False
@@ -49,3 +49,16 @@ def safe_delete_user(user_id: int) -> str:
             ), [user.id])
 
     return f"✅ User {user_id} deleted safely."
+
+
+def user_has_permission(user, app_label, model_name, permission_type):
+    if user.is_superuser or user.is_staff:
+        return True
+    if not user.role:
+        return False
+    return RolePermission.objects.filter(
+        role=user.role,
+        permission__app_label=app_label,
+        permission__model_name=model_name,
+        permission__permission_type=permission_type,
+    ).exists()

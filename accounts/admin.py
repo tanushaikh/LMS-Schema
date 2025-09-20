@@ -19,9 +19,30 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("email", "user_type", "role", "is_active", "created_at")
-    search_fields = ("email", "user_type", "role__name")
-    list_filter = ("user_type", "is_active", "created_at")
+    list_display = ("email", "role", "is_superuser", "is_staff", "is_active", "created_at")
+    search_fields = ("email", "role__name")
+    list_filter = ("is_superuser", "is_staff", "is_active", "created_at", "role")
+    ordering = ("-created_at",)
+
+    # Make sure role is editable in the form
+    fieldsets = (
+        (None, {
+            "fields": ("email", "username", "password", "role")
+        }),
+        ("Permissions", {
+            "fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")
+        }),
+        ("Important dates", {
+            "fields": ("last_login", "date_joined")
+        }),
+    )
+
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "username", "password1", "password2", "role", "is_staff", "is_superuser"),
+        }),
+    )
 
 
 @admin.register(Permission)

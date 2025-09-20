@@ -13,10 +13,6 @@ class UserManager(BaseUserManager):
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
 
-        extra_fields["is_active"] = True
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", False)
-
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -27,7 +23,14 @@ class UserManager(BaseUserManager):
         extra_fields["is_staff"] = True
         extra_fields["is_superuser"] = True
 
+        # Auto-assign Admin role
+        admin_role, _ = Role.objects.get_or_create(
+            name="Admin", defaults={"description": "Superuser role", "slug": "admin"}
+        )
+        extra_fields.setdefault("role", admin_role)
+
         return self.create_user(email, password, **extra_fields)
+
 
 # -------------------------------
 # ROLE MODEL
@@ -89,37 +92,90 @@ class RolePermission(models.Model):
 # -------------------------------
 # USER MODEL
 # -------------------------------
-USER_TYPE_CHOICES = (
-        ('student', 'Student'),
-        ('instructor', 'Instructor'),
-        ('admin', 'Admin'),
-    )
 class User(AbstractUser):
-    username = models.CharField(max_length=150, unique=True)  # re-add username
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=255,blank=True)
-    last_name = models.CharField(max_length=255,blank=True)
-    confirm_password = models.CharField(max_length=255,unique=True )
-    learning_goal = models.CharField(max_length=255,blank=True)
-    role = models.ForeignKey("Role", on_delete=models.SET_NULL, null=True, blank=True)
-    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
+    learning_goal = models.CharField(max_length=255, blank=True)
+    role = models.ForeignKey("Role", on_delete=models.CASCADE, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "user_type"]
+    REQUIRED_FIELDS = ["username"]
+
     objects = UserManager()
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.email)
+            base_slug = slugify(self.email)
+            slug = base_slug
+            counter = 1
+            while User.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
+
+    def has_permission(self, app_label, model_name, perm_type):
+        if self.is_superuser:
+            return True
+        return RolePermission.objects.filter(
+            role=self.role,
+            permission__app_label=app_label,
+            permission__model_name=model_name,
+            permission__permission_type=perm_type
+        ).exists()
+
+    def has_module_perms(self, app_label):
+        if self.is_superuser:
+            return True
+        return RolePermission.objects.filter(
+            role=self.role,
+            permission__app_label=app_label
+        ).exists()
+
+    def has_perm(self, perm, obj=None):
+        if self.is_superuser:
+            return True
+        try:
+            app_label, action_model = perm.split(".")
+            action, model_name = action_model.split("_", 1)
+        except ValueError:
+            return False
+        return self.has_permission(app_label, model_name, action)
 
     def __str__(self):
         return self.email
 
+
+from django.utils.text import slugify
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name="posts")
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(f"{self.title}-{self.user.id}")
+            slug = base_slug
+            counter = 1
+            # Check for uniqueness
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 # -------------------------------
 # PROFILE MODEL
@@ -157,22 +213,3 @@ class UserLog(models.Model):
     def __str__(self):
         return f"{self.user.email if self.user else 'Anonymous'} - {self.action} ({self.model_name})"
 
-
-# -------------------------------
-# POST MODEL (User can create posts/views)
-# -------------------------------
-class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True,  null=True, related_name="posts")
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(unique=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.title}-{self.user.id}")
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
