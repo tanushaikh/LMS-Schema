@@ -154,6 +154,14 @@ class PostViewSet(viewsets.ModelViewSet):
         if not post.slug:
             post.slug = slugify(f"{post.title}-{user.username}")
             post.save()
+            
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Post deleted successfully"},
+            status=status.HTTP_200_OK
+        )
 
 # -------------------------------
 # ROLE VIEWSET
@@ -161,6 +169,13 @@ class PostViewSet(viewsets.ModelViewSet):
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Role deleted successfully"},
+            status=status.HTTP_200_OK
+        )  
 
 # -------------------------------
 # PERMISSION VIEWSET
@@ -168,6 +183,14 @@ class RoleViewSet(viewsets.ModelViewSet):
 class PermissionViewSet(viewsets.ModelViewSet):
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Permission deleted successfully"},
+            status=status.HTTP_200_OK
+        )
 
 # -------------------------------
 # ROLE PERMISSION VIEWSET
@@ -175,11 +198,27 @@ class PermissionViewSet(viewsets.ModelViewSet):
 class RolePermissionViewSet(viewsets.ModelViewSet):
     queryset = RolePermission.objects.all()
     serializer_class = RolePermissionSerializer
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "RolesPermission deleted successfully"},
+            status=status.HTTP_200_OK
+        )
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Profile deleted successfully"},
+            status=status.HTTP_200_OK
+        )
 
 
 class LogoutView(APIView):

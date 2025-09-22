@@ -5,11 +5,34 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from django.db.models import Avg
+from accounts.permissions import HasModelPermission
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all().order_by("-id")
     serializer_class = AssignmentSerializer
-    permission_classes = []
+    permission_classes = [HasModelPermission]
+
+    app_label = "assignments"
+    model_name = "assignment"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
     def perform_create(self, serializer):
         serializer.save()
@@ -40,8 +63,29 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 class AssignmentSubmissionViewSet(viewsets.ModelViewSet):
     queryset = AssignmentSubmission.objects.all().order_by("-submitted_at")
     serializer_class = AssignmentSubmissionSerializer
-    permission_classes = []
+    permission_classes = [HasModelPermission]
 
+    app_label = "assignments"
+    model_name = "assignmentsubmission"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
     def perform_create(self, serializer):
         serializer.save()
         

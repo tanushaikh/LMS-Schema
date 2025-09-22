@@ -4,10 +4,34 @@ from rest_framework import status
 from .models import Schedule
 from .serializers import ScheduleSerializer
 from accounts.models import User
+from accounts.permissions import HasModelPermission
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "schedule"
+    model_name = "schedule"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated:

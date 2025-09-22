@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class HasModelPermission(permissions.BasePermission):
     """
     Dynamic permission check based on user role and action.

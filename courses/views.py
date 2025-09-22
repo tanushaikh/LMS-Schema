@@ -3,6 +3,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Avg
 from accounts.models import User
+from accounts.permissions import HasModelPermission
+from django.db import IntegrityError
+
+
 
 from .models import Course, Meeting, CourseEnrollment
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
@@ -13,6 +17,29 @@ from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSe
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "courses"
+    model_name = "course"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -57,6 +84,29 @@ class CourseViewSet(viewsets.ModelViewSet):
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "courses"
+    model_name = "meeting"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -84,6 +134,29 @@ class MeetingViewSet(viewsets.ModelViewSet):
 class CourseEnrollmentViewSet(viewsets.ModelViewSet):
     queryset = CourseEnrollment.objects.all()
     serializer_class = CourseEnrollmentSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "courses"
+    model_name = "courseenrollment"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        post = serializer.save(user=user)
+        if not post.slug:
+            post.slug = slugify(f"{post.title}-{user.username}")
+            post.save()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
