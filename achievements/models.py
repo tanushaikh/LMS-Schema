@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils.text import slugify
+import uuid
+from django.utils.text import slugify
+from django.db import models
 
 class Achievement(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)  # required
-
-    # optional fields
     category = models.CharField(max_length=200, blank=True, null=True)
     points = models.IntegerField(blank=True, null=True)
     rarity = models.CharField(max_length=200, blank=True, null=True)
@@ -37,11 +38,20 @@ class Certificate(models.Model):
     issued_on = models.DateTimeField(blank=True, null=True)
     certificate_file = models.FileField(upload_to='certificates/', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while Certificate.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
+        super().save(*args, **kwargs)
 
 
-import uuid
-from django.utils.text import slugify
-from django.db import models
 
 class Analytics(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)

@@ -27,11 +27,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
+        serializer.save(user=self.request.user)
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated:

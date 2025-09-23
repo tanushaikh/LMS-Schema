@@ -35,11 +35,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -102,11 +98,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -152,11 +144,7 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -171,10 +159,3 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            serializer.save(user=self.request.user)
-        else:
-            default_user = User.objects.first()  # test ke liye
-            serializer.save(user=default_user)

@@ -33,13 +33,15 @@ class Course(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.title)
-            unique_slug = base_slug
-            counter = 1
-            while Course.objects.filter(slug=unique_slug).exists():
-                unique_slug = f"{base_slug}-{counter}"
-                counter += 1
-            self.slug = unique_slug
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while Course.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -68,11 +70,16 @@ class Meeting(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.title)
-            unique_slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
-            self.slug = unique_slug
-        super().save(*args, **kwargs)
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while Meeting.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
 
+        super().save(*args, **kwargs)
 
 # -------------------------------
 # COURSE ENROLLMENT MODEL
@@ -86,6 +93,13 @@ class CourseEnrollment(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            # UUID based slug since no title exists
-            self.slug = f"enroll-{uuid.uuid4().hex[:8]}"
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while CourseEnrollment.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
         super().save(*args, **kwargs)

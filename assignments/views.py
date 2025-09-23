@@ -27,15 +27,10 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         self.permission_type = action_permission_map.get(self.action, None)
         return super().get_permissions()
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
 
     def perform_create(self, serializer):
         serializer.save()
+
     @action(detail=False, methods=["get"], url_path="total")
     def total_assignment(self, request):
         total = Assignment.objects.count()
@@ -80,12 +75,6 @@ class AssignmentSubmissionViewSet(viewsets.ModelViewSet):
         self.permission_type = action_permission_map.get(self.action, None)
         return super().get_permissions()
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
     def perform_create(self, serializer):
         serializer.save()
         
