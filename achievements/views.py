@@ -75,6 +75,7 @@ class CertificateViewSet(viewsets.ModelViewSet):
         if not post.slug:
             post.slug = slugify(f"{post.title}-{user.username}")
             post.save()
+
     def destroy(self, request, *args, **kwargs):
             instance = self.get_object()
             instance.delete()
@@ -83,6 +84,7 @@ class CertificateViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+import uuid
 
 class AnalyticsViewSet(viewsets.ModelViewSet):
     queryset = Analytics.objects.all().order_by("-last_active")
@@ -105,11 +107,8 @@ class AnalyticsViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        user = self.request.user
-        post = serializer.save(user=user)
-        if not post.slug:
-            post.slug = slugify(f"{post.title}-{user.username}")
-            post.save()
+        serializer.save(user=self.request.user)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()

@@ -39,6 +39,10 @@ class Certificate(models.Model):
     slug = models.SlugField(unique=True, blank=True)
 
 
+import uuid
+from django.utils.text import slugify
+from django.db import models
+
 class Analytics(models.Model):
     user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey("courses.Course", on_delete=models.CASCADE, null=True, blank=True)
@@ -46,3 +50,16 @@ class Analytics(models.Model):
     sessions_completed = models.IntegerField(blank=True, null=True)
     last_active = models.DateTimeField(blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while Analytics.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
+        super().save(*args, **kwargs)
