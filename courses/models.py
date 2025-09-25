@@ -2,12 +2,16 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 import uuid
+from django.conf import settings
 
 # -------------------------------
 # COURSE MODEL
 # -------------------------------
 class Course(models.Model):
     title = models.CharField(max_length=200)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="courses", null=True, blank=True
+    )
     instructor = models.CharField(max_length=200, null=True, blank=True)
     level  = models.CharField(max_length=200, null=True, blank=True)
     duration_minutes = models.IntegerField(default=0)
@@ -26,7 +30,9 @@ class Course(models.Model):
     ai_assisted = models.BooleanField(default=True)
     category = models.CharField(max_length=100, null=True, blank=True)
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
-    created_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, blank=True, null=True)
@@ -34,10 +40,9 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
             
-            # Ensure slug is unique (extra safety)
             while Course.objects.filter(slug=self.slug).exists():
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
@@ -47,19 +52,14 @@ class Course(models.Model):
     def __str__(self):
         return f"course {self.pk}"
 
-
 # -------------------------------
 # MEETING MODEL
 # -------------------------------
 class Meeting(models.Model):
-    # 🔥 CHANGE: Ab Meeting ek Course se linked hai
     course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,  
-        related_name="meetings",null=True, 
-    blank=True
+        Course, on_delete=models.CASCADE, related_name="meetings", null=True, blank=True
     )
-    host = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+    host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     meeting_link = models.URLField(null=True, blank=True)
     platform = models.CharField(max_length=100, null=True, blank=True)
@@ -70,23 +70,20 @@ class Meeting(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            base_slug = slugify(self.host.username) if self.host else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
-            
-            # Ensure slug is unique (extra safety)
             while Meeting.objects.filter(slug=self.slug).exists():
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
-
         super().save(*args, **kwargs)
 
 # -------------------------------
 # COURSE ENROLLMENT MODEL
 # -------------------------------
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE,related_name="enrollments",null=True,blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments", null=True, blank=True)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)
     slug = models.SlugField(unique=True, blank=True, null=True)     
@@ -94,12 +91,9 @@ class CourseEnrollment(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
-            
-            # Ensure slug is unique (extra safety)
             while CourseEnrollment.objects.filter(slug=self.slug).exists():
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
-
         super().save(*args, **kwargs)
