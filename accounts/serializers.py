@@ -24,17 +24,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
-        """Check password match"""
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError({"password": "Passwords do not match."})
         return data
 
     def create(self, validated_data):
-        role = validated_data.pop('role_id')  # Extract role
+        role = validated_data.pop('role_id')
         validated_data.pop('confirm_password')
         validated_data['password'] = make_password(validated_data['password'])
         validated_data['role'] = role
-        return User.objects.create(**validated_data)
+
+        user = User.objects.create(**validated_data)
+
+        Profile.objects.create(
+            user=user,
+            full_name=f"{user.first_name} {user.last_name}".strip() or user.username
+        )
+
+        return user
 
 
 # -------------------------------
