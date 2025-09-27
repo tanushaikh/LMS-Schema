@@ -114,11 +114,23 @@ class PostSerializer(serializers.ModelSerializer):
 # -------------------------------
 # PROFILE SERIALIZER
 # -------------------------------
+# serializers.py
+
 class ProfileSerializer(serializers.ModelSerializer):
-    user = RegisterSerializer(read_only=True)
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
         fields = ["id", "user", "full_name", "age", "gender", "bio",
                   "profile_picture", "mobile", "country", "slug"]
 
+    def get_user(self, obj):
+        return {
+            "id": obj.user.id,
+            "email": obj.user.email,
+            "username": obj.user.username,
+            "first_name": obj.user.first_name,
+            "last_name": obj.user.last_name,
+            "learning_goal": obj.user.learning_goal,
+            "role": obj.user.role.name if obj.user.role else None,
+        }

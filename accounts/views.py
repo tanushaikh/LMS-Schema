@@ -215,8 +215,16 @@ class RolePermissionViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.AllowAny]
-    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """Return only the profile of the logged-in user"""
+        return Profile.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Ensure profile is linked to the logged-in user"""
+        serializer.save(user=self.request.user)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
