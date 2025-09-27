@@ -59,6 +59,9 @@ class Meeting(models.Model):
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name="meetings", null=True, blank=True
     )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="meetings", null=True, blank=True
+    )
     host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200)
     meeting_link = models.URLField(null=True, blank=True)
@@ -82,7 +85,9 @@ class Meeting(models.Model):
 # COURSE ENROLLMENT MODEL
 # -------------------------------
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="enrollments", null=True, blank=True
+    )
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments", null=True, blank=True)
     enrolled_on = models.DateTimeField(default=timezone.now)
     is_completed = models.BooleanField(default=False)

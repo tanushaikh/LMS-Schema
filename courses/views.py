@@ -77,6 +77,10 @@ class CourseViewSet(viewsets.ModelViewSet):
 # -------------------------------
 # MEETING VIEWSET
 # -------------------------------
+import logging
+logger = logging.getLogger(__name__)  # create logger instance
+
+
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
@@ -98,26 +102,36 @@ class MeetingViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        meeting = serializer.save(user=self.request.user)
+        logger.info(f"Meeting created successfully (ID={meeting.id}) by user={self.request.user}")
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         try:
             self.perform_destroy(instance)
+            logger.info(f"Meeting deleted successfully (ID={instance.id}) by user={request.user}")
             return Response({"message": "Meeting deleted successfully"}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(f"Failed to delete meeting (ID={instance.id}) by user={request.user}: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         if 'title' not in data or not data['title']:
+            logger.warning(f"Create meeting failed - missing title (user={request.user})")
             return Response({"title": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
         if 'meeting_link' not in data or not data['meeting_link']:
+            logger.warning(f"Create meeting failed - missing meeting_link (user={request.user})")
             return Response({"meeting_link": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            logger.info(f"Meeting created successfully with title='{serializer.data.get('title')}' by user={request.user}")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Failed to create meeting (user={request.user}): {e}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # -------------------------------
