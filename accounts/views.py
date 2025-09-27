@@ -86,6 +86,8 @@ class LoginView(APIView):
             "Learning Goal": user.learning_goal,
             "First Name": user.first_name,
             "Email": user.email,
+            "Username": user.username,
+            "Role": user.role.name,
             "Last Name": user.last_name,
             "Permissions": [rp.permission.slug for rp in role_permissions],
         }, status=status.HTTP_200_OK)
