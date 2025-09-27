@@ -83,8 +83,11 @@ class LoginView(APIView):
             "message": "Login successful",
             "access": str(refresh.access_token),
             "refresh": str(refresh),
-            "role": user.role.name,
-            "permissions": [rp.permission.slug for rp in role_permissions],
+            "Learning Goal": user.learning_goal,
+            "First Name": user.first_name,
+            "Email": user.email,
+            "Last Name": user.last_name,
+            "Permissions": [rp.permission.slug for rp in role_permissions],
         }, status=status.HTTP_200_OK)
 
 class UserDetailView(APIView):
