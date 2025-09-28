@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
 from .models import Assignment, AssignmentSubmission
 from .serializers import AssignmentSerializer, AssignmentSubmissionSerializer
 from rest_framework.response import Response
@@ -23,8 +24,6 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             "update": "edit",
             "partial_update": "edit",
             "destroy": "delete",
-             "average_score": "view",   
-            "total_assignment": "view"
         }
         self.permission_type = action_permission_map.get(self.action, None)
         return super().get_permissions()
@@ -33,21 +32,6 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-    @action(detail=False, methods=["get"], url_path="total")
-    def total_assignment(self, request):
-        total = Assignment.objects.count()
-        return Response(
-            {"total_assignment": total},
-            status=status.HTTP_200_OK
-        )
-    @action(detail=False, methods=["get"], url_path="average-score")
-    def average_score(self, request):
-        avg_score = Assignment.objects.aggregate(avg=Avg("points"))["avg"] or 0
-        percentage = round(avg_score, 2)
-        return Response(
-            {"average_score": f"{percentage}%"},
-            status=status.HTTP_200_OK
-        )
         # 👇 delete response customize
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -57,6 +41,34 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
     
+
+class AssignmentTotalAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "assignments"
+    model_name = "assignment"
+    permission_type = "view" 
+
+    def get(self, request, *args, **kwargs):
+        total = Assignment.objects.count()
+        return Response(
+            {"total_assignment": total},
+            status=status.HTTP_200_OK
+        )
+
+
+class AssignmentAverageScoreAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "assignments"
+    model_name = "assignment"
+    permission_type = "view"
+
+    def get(self, request, *args, **kwargs):
+        avg_score = Assignment.objects.aggregate(avg=Avg("points"))["avg"] or 0
+        percentage = round(avg_score, 2)
+        return Response(
+            {"average_score": f"{percentage}%"},
+            status=status.HTTP_200_OK
+        )
 class AssignmentSubmissionViewSet(viewsets.ModelViewSet):
     queryset = AssignmentSubmission.objects.all().order_by("-submitted_at")
     serializer_class = AssignmentSubmissionSerializer

@@ -20,14 +20,15 @@ class HasModelPermission(permissions.BasePermission):
             "destroy": "delete",
         }
 
-        # Determine action
-        perm_type = action_permission_map.get(view.action)
+        if hasattr(view, "action"):
+            perm_type = action_permission_map.get(view.action)
+        else:
+            perm_type = getattr(view, "permission_type", None)
+
         if not perm_type:
             return False
 
-        # Superuser bypass
         if user.is_superuser:
             return True
 
-        # Check user role permission
         return user.has_permission(view.app_label, view.model_name, perm_type)

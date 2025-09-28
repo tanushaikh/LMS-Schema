@@ -102,3 +102,32 @@ class CourseEnrollment(models.Model):
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
         super().save(*args, **kwargs)
+
+
+
+class CourseStreak(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="streak"
+    )
+    current_streak = models.IntegerField(default=0)
+    longest_streak = models.IntegerField(default=0)
+    last_active = models.DateField(null=True, blank=True)
+
+    def update_streak(self):
+        today = timezone.now().date()
+        if self.last_active == today:
+            return
+
+        if self.last_active == today - timezone.timedelta(days=1):
+            self.current_streak += 1
+        else:
+            self.current_streak = 1
+
+        if self.current_streak > self.longest_streak:
+            self.longest_streak = self.current_streak
+
+        self.last_active = today
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.username} Streak: {self.current_streak}"

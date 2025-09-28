@@ -2,16 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Avg
-from accounts.models import User
 from accounts.permissions import HasModelPermission
 from django.db import IntegrityError
-
-
-
-from .models import Course, Meeting, CourseEnrollment
+from rest_framework.views import APIView
+from .models import Course, Meeting, CourseEnrollment,CourseStreak
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
-
-
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -37,6 +32,15 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+
+        # 👇 Update streak when course is opened
+        if request.user.is_authenticated:
+            streak, _ = CourseStreak.objects.get_or_create(user=request.user)
+            streak.update_streak()
+
+        return response
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         try:
@@ -56,24 +60,52 @@ class CourseViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=False, methods=["get"], url_path="total")
-    def total_courses(self, request):
+class UserStreakAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        streak, _ = CourseStreak.objects.get_or_create(user=request.user)
+        return Response({
+            "current_streak": streak.current_streak,
+            "longest_streak": streak.longest_streak,
+            "last_active": streak.last_active
+        }, status=status.HTTP_200_OK)
+
+class CourseTotalAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "courses"
+    model_name = "course"
+    permission_type = "view"  # requires courses.view_course
+
+    def get(self, request, *args, **kwargs):
         total = Course.objects.count()
         return Response({"total_courses": total}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="average-score")
-    def average_score(self, request):
+
+class CourseAverageScoreAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "courses"
+    model_name = "course"
+    permission_type = "view"
+
+    def get(self, request, *args, **kwargs):
         avg_score = Course.objects.aggregate(avg=Avg("score"))["avg"] or 0
         percentage = round(avg_score, 2)
         return Response({"average_score": f"{percentage}%"}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="average-learning-time")
-    def average_learning_time(self, request):
+
+class CourseAverageLearningTimeAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "courses"
+    model_name = "course"
+    permission_type = "view" 
+
+    def get(self, request, *args, **kwargs):
         avg_minutes = Course.objects.aggregate(avg=Avg("duration_minutes"))["avg"] or 0
         hours = int(avg_minutes // 60)
         minutes = int(avg_minutes % 60)
-        return Response({"average_learning_time": f"{hours}h {minutes}m"}, status=status.HTTP_200_OK)
-
+        return Response(
+            {"average_learning_time": f"{hours}h {minutes}m"},
+            status=status.HTTP_200_OK
+        )
 # -------------------------------
 # MEETING VIEWSET
 # -------------------------------
@@ -173,3 +205,30 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+class StudentTotalHoursAPIView(APIView):
+    permission_classes = [HasModelPermission]
+    app_label = "courses"
+    model_name = "meeting"
+    permission_type = "view"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        meetings = Meeting.objects.filter(user=user, start_time__isnull=False, end_time__isnull=False)
+
+        total_seconds = 0
+        for meeting in meetings:
+            total_seconds += (meeting.end_time - meeting.start_time).total_seconds()
+
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds % 3600) // 60)
+
+        return Response(
+            {"total_meeting_time": f"{hours}h {minutes}m"},
+            status=status.HTTP_200_OK
+        )
