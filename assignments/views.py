@@ -23,6 +23,8 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             "update": "edit",
             "partial_update": "edit",
             "destroy": "delete",
+             "average_score": "view",   
+            "total_assignment": "view"
         }
         self.permission_type = action_permission_map.get(self.action, None)
         return super().get_permissions()
