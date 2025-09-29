@@ -103,8 +103,6 @@ class CourseEnrollment(models.Model):
                 self.slug = f"{base_slug}-{unique_suffix}"
         super().save(*args, **kwargs)
 
-
-
 class CourseStreak(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="streak"

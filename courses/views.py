@@ -7,7 +7,37 @@ from django.db import IntegrityError
 from rest_framework.views import APIView
 from .models import Course, Meeting, CourseEnrollment,CourseStreak
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
+from datetime import date, timedelta
 
+class StudyPlanGenerator:
+    def __init__(self, course, days: int = 7):
+        """
+        Initialize study plan generator.
+        :param course: Course instance
+        :param days: Number of days to split topics into
+        """
+        self.course = course
+        self.days = days
+        self.topics = course.skills if course.skills else []
+
+    def generate_plan(self):
+        if not self.topics:
+            return {}
+
+        topics_per_day = max(1, len(self.topics) // self.days)
+        plan = {}
+        start_date = date.today()
+
+        for i in range(self.days):
+            day_topics = self.topics[i * topics_per_day:(i + 1) * topics_per_day]
+            if not day_topics:
+                break
+            plan[str(start_date + timedelta(days=i))] = day_topics
+
+        return {
+            "course": self.course.title,
+            "week_plan": plan
+        }
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -17,48 +47,19 @@ class CourseViewSet(viewsets.ModelViewSet):
     app_label = "courses"
     model_name = "course"
 
-    def get_permissions(self):
-        action_permission_map = {
-            "create": "add",
-            "list": "view",
-            "retrieve": "view",
-            "update": "edit",
-            "partial_update": "edit",
-            "destroy": "delete",
-        }
-        self.permission_type = action_permission_map.get(self.action, None)
-        return super().get_permissions()
-
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    def retrieve(self, request, *args, **kwargs):
-        response = super().retrieve(request, *args, **kwargs)
+    @action(detail=True, methods=["get"], url_path="study-plan")
+    def study_plan(self, request, pk=None):
+        course = self.get_object()
+        generator = StudyPlanGenerator(course, days=7)
+        plan = generator.generate_plan()
 
-        # 👇 Update streak when course is opened
-        if request.user.is_authenticated:
-            streak, _ = CourseStreak.objects.get_or_create(user=request.user)
-            streak.update_streak()
+        if not plan.get("week_plan"):
+            return Response({"error": "No topics found for this course."}, status=400)
 
-        return response
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        try:
-            self.perform_destroy(instance)
-            return Response(
-                {"message": "Course deleted successfully"},
-                status=status.HTTP_200_OK
-            )
-        except IntegrityError as e:
-            return Response(
-                {"error": "Cannot delete this course because it has related objects (Meetings/Enrollments)."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response(plan, status=status.HTTP_200_OK)
 
 class UserStreakAPIView(APIView):
     def get(self, request, *args, **kwargs):
@@ -205,8 +206,6 @@ class CourseEnrollmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
 
 class StudentTotalHoursAPIView(APIView):
     permission_classes = [HasModelPermission]
