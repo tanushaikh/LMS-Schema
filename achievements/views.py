@@ -6,6 +6,11 @@ from rest_framework import status
 from rest_framework.decorators import action
 from accounts.permissions import HasModelPermission
 from django.utils.text import slugify
+from rest_framework.views import APIView
+from django.utils import timezone
+from datetime import timedelta
+from courses.models import CourseEnrollment
+from assignments.models import AssignmentSubmission
 
 class AchievementViewSet(viewsets.ModelViewSet):
     queryset = Achievement.objects.all().order_by("-earned_on")
@@ -111,3 +116,81 @@ class AnalyticsViewSet(viewsets.ModelViewSet):
             {"message": "Analytics deleted successfully"},
             status=status.HTTP_200_OK
         )
+
+from accounts.permissions import HasModelPermission  # optional, if you want it elsewhere
+from rest_framework.permissions import BasePermission
+
+
+# -------------------------------
+# Custom Permission for Weekly Analytics
+# -------------------------------
+class WeeklyAnalyticsPermission(BasePermission):
+    """
+    Permission class that checks if user has view permissions for:
+    - CourseEnrollment
+    - AssignmentSubmission
+    """
+    def has_permission(self, request, view):
+        user = request.user
+        if not user.is_authenticated:
+            return False
+
+        # Check permission for CourseEnrollment
+        if not user.has_perm("courses.view_courseenrollment"):
+            return False
+
+        # Check permission for AssignmentSubmission
+        if not user.has_perm("assignments.view_assignmentsubmission"):
+            return False
+
+        return True
+
+
+# -------------------------------
+# Weekly Analytics View
+# -------------------------------
+class WeeklyAnalyticsView(APIView):
+    """
+    Returns weekly performance analytics per course/subject
+    based on assignment completion.
+    """
+    permission_classes = [WeeklyAnalyticsPermission]
+
+    def get(self, request):
+        user = request.user
+
+        today = timezone.now().date()
+        week_ago = today - timedelta(days=6)
+
+        # Get all course enrollments of the user
+        enrollments = CourseEnrollment.objects.filter(user=user)
+        analytics_data = []
+
+        for enrollment in enrollments:
+            course = enrollment.course
+
+            # Count total assignments submitted this week
+            total_assignments = AssignmentSubmission.objects.filter(
+                user=user,
+                assignment__course=course,
+                submitted_on__date__range=[week_ago, today]
+            ).count()
+
+            # Count completed assignments
+            completed_assignments = AssignmentSubmission.objects.filter(
+                user=user,
+                assignment__course=course,
+                submitted_on__date__range=[week_ago, today],
+                status="completed"  # adjust according to your model field
+            ).count()
+
+            progress_percent = (completed_assignments / total_assignments * 100) if total_assignments else 0
+
+            analytics_data.append({
+                "course": course.title,
+                "total_assignments": total_assignments,
+                "completed_assignments": completed_assignments,
+                "progress_percent": round(progress_percent, 2)
+            })
+
+        return Response({"weekly_analytics": analytics_data}, status=status.HTTP_200_OK)

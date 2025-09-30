@@ -51,10 +51,6 @@ class Assignment(models.Model):
         return self.title
 
 
-
-
-
-
 class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey(
         Assignment, on_delete=models.SET_NULL, null=True, blank=True

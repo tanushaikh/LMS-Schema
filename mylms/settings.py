@@ -173,27 +173,12 @@ X_FRAME_OPTIONS = "DENY"
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 # -----------------------
-# REST Framework defaults
+#       REST Framework
 # -----------------------
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": (
-#         "rest_framework.authentication.TokenAuthentication",
-#         "rest_framework.authentication.SessionAuthentication",
-#     ),
-#     # Safer default: require auth unless overridden per-view
-#     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-#     "DEFAULT_PARSER_CLASSES": (
-#         "rest_framework.parsers.JSONParser",
-#         "rest_framework.parsers.FormParser",
-#         "rest_framework.parsers.MultiPartParser",
-#     ),
-# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",  # browsable API login
-
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
