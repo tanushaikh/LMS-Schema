@@ -32,3 +32,24 @@ class HasModelPermission(permissions.BasePermission):
             return True
 
         return user.has_permission(view.app_label, view.model_name, perm_type)
+
+
+# 👇 ye tumhare analytics ke liye specific permission hai
+class WeeklyAnalyticsPermission(permissions.BasePermission):
+    """
+    Check if user has 'view' permission for course enrollment and assignment submission
+    """
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not user.is_authenticated:
+            return False
+
+        if user.is_superuser:
+            return True
+
+        # yaha dono permission check honi chahiye
+        return (
+            user.has_permission("courses", "courseenrollment", "view")
+            and user.has_permission("assignments", "assignmentsubmission", "view")
+        )
