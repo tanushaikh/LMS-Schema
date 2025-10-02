@@ -4,7 +4,9 @@ from .models import Session
 from .serializers import SessionSerializer
 from accounts.models import User
 from accounts.permissions import HasModelPermission
-
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from accounts.utils import get_weekly_goals
 
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
@@ -48,3 +50,12 @@ class SessionViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"message": "Session deleted successfully"}, status=status.HTTP_200_OK)
+
+
+class WeeklyGoalsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        data = get_weekly_goals(user)
+        return Response(data)
