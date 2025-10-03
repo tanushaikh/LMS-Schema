@@ -3,6 +3,12 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.db import transaction, connection
 from .models import RolePermission
+from datetime import timedelta
+from django.utils import timezone
+from courses.models import CourseEnrollment
+from assignments.models import AssignmentSubmission
+from session_lms.models import Session
+
 def has_permission(user, app_model, action):
     if not user.role:
         return False
@@ -62,3 +68,43 @@ def user_has_permission(user, app_label, model_name, permission_type):
         permission__model_name=model_name,
         permission__permission_type=permission_type,
     ).exists()
+
+
+
+def get_weekly_goals(user):
+    today = timezone.now().date()
+    week_start = today - timedelta(days=today.weekday())  # Monday
+    week_end = week_start + timedelta(days=6)  # Sunday
+
+    # -------------------------------
+    # Lessons completed this week
+    # -------------------------------
+    lessons_completed = CourseEnrollment.objects.filter(
+        user=user,
+        enrolled_on__date__range=[week_start, week_end],
+        is_completed=True
+    ).count()
+
+    # -------------------------------
+    # Assignments submitted this week
+    # -------------------------------
+    assignments_submitted = AssignmentSubmission.objects.filter(
+        user=user,
+        submitted_at__date__range=[week_start, week_end]
+    ).count()
+
+    # -------------------------------
+    # Sessions attended this week
+    # -------------------------------
+    sessions_attended = Session.objects.filter(
+        user=user,
+        start_time__date__range=[week_start, week_end]
+    ).count()
+
+    return {
+        "week_start": week_start,
+        "week_end": week_end,
+        "lessons_completed": lessons_completed,
+        "assignments_submitted": assignments_submitted,
+        "sessions_attended": sessions_attended,
+    }
