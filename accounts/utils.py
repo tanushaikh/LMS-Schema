@@ -69,8 +69,6 @@ def user_has_permission(user, app_label, model_name, permission_type):
         permission__permission_type=permission_type,
     ).exists()
 
-
-
 def get_weekly_goals(user):
     today = timezone.now().date()
     week_start = today - timedelta(days=today.weekday())  # Monday
