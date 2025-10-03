@@ -62,3 +62,27 @@ def user_has_permission(user, app_label, model_name, permission_type):
         permission__model_name=model_name,
         permission__permission_type=permission_type,
     ).exists()
+
+# accounts/utils.py
+from assignments.models import AssignmentSubmission
+from django.utils import timezone
+from datetime import timedelta
+
+def get_weekly_goals(user):
+    """
+    Returns number of assignments completed in the last 7 days by the user
+    """
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=6)
+
+    completed = AssignmentSubmission.objects.filter(
+        user=user,
+        submitted_on__date__range=[week_ago, today],
+        status="completed"
+    ).count()
+
+    return {
+        "weekly_completed": completed,
+        "goal": 5,  # yaha tum apna logic daal sakti ho (e.g., weekly goal = 5 assignments)
+        "status": "achieved" if completed >= 5 else "in-progress"
+    }
