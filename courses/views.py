@@ -241,3 +241,60 @@ class StudentTotalHoursAPIView(APIView):
             {"total_meeting_time": f"{hours}h {minutes}m"},
             status=status.HTTP_200_OK
         )
+
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.http import FileResponse
+from .models import CoursePDF, RecentDownload
+from .serializers import CoursePDFSerializer, RecentDownloadSerializer
+from accounts.permissions import HasModelPermission
+
+
+# -------------------------------
+# COURSE PDF VIEWSET
+# -------------------------------
+class CoursePDFViewSet(viewsets.ModelViewSet):
+    queryset = CoursePDF.objects.all().order_by("-uploaded_at")
+    serializer_class = CoursePDFSerializer
+    permission_classes = [HasModelPermission]
+
+
+# -------------------------------
+# RECENT DOWNLOAD VIEWSET
+# -------------------------------
+class RecentDownloadViewSet(viewsets.ModelViewSet):
+    queryset = RecentDownload.objects.all().order_by("-downloaded_at")
+    serializer_class = RecentDownloadSerializer
+    permission_classes = [HasModelPermission]
+
+
+# -------------------------------
+# PDF DOWNLOAD API
+# -------------------------------
+class PDFDownloadView(APIView):
+    permission_classes = [HasModelPermission]
+
+    def get(self, request, course_id, pdf_id):
+        try:
+            pdf = CoursePDF.objects.get(id=pdf_id, course_id=course_id)
+
+            # log recent download
+            if request.user.is_authenticated:
+                RecentDownload.objects.create(user=request.user, pdf=pdf)
+
+            # stream file response
+            response = FileResponse(pdf.file.open("rb"), content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{pdf.title}.pdf"'
+            return response
+
+        except CoursePDF.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "PDF not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"status": "error", "message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

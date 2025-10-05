@@ -129,3 +129,30 @@ class CourseStreak(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Streak: {self.current_streak}"
+# -------------------------------
+# COURSE PDF MODEL
+# -------------------------------
+class CoursePDF(models.Model):
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name="pdfs"
+    )
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="course_pdfs/")
+    uploaded_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.title} ({self.course.title})"
+
+
+# -------------------------------
+# RECENT DOWNLOAD MODEL
+# -------------------------------
+class RecentDownload(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="downloads"
+    )
+    pdf = models.ForeignKey(CoursePDF, on_delete=models.CASCADE, related_name="downloads")
+    downloaded_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} downloaded {self.pdf.title}"
