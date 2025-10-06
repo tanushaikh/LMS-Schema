@@ -36,7 +36,7 @@ class Assignment(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.user.username) if self.user else "anon"
+            base_slug = slugify(self.created_by.username) if self.created_by.username else "anon"
             unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
             self.slug = f"{base_slug}-{unique_suffix}"
             

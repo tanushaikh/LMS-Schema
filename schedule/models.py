@@ -1,8 +1,7 @@
 from django.db import models
 from django.conf import settings
-import uuid
 from django.utils.text import slugify
-from django.db import models
+import uuid
 
 class Schedule(models.Model):
     user = models.ForeignKey(
@@ -24,13 +23,17 @@ class Schedule(models.Model):
     status = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
+
+    # 👇 Add slug field
+    slug = models.SlugField(unique=True, blank=True, null=True)
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            base_slug = slugify(self.title) or "schedule"  # use title, fallback "schedule"
+            unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
-            
-            # Ensure slug is unique (extra safety)
+
+            # ensure uniqueness
             while Schedule.objects.filter(slug=self.slug).exists():
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
