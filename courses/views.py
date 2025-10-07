@@ -5,9 +5,10 @@ from django.db.models import Avg
 from accounts.permissions import HasModelPermission
 from django.db import IntegrityError
 from rest_framework.views import APIView
-from .models import Course, Meeting, CourseEnrollment,CourseStreak
-from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer
+from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, RecentDownload
+from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer
 from datetime import date, timedelta
+from django.http import FileResponse
 
 class StudyPlanGenerator:
     def __init__(self, course, days: int = 7):
@@ -83,7 +84,7 @@ class UserStreakAPIView(APIView):
 class CourseTotalAPIView(APIView):
     permission_classes = [HasModelPermission]
     app_label = "courses"
-    model_name = "course"
+    model_name = "course_total"
     permission_type = "view"  # requires courses.view_course
 
     def get(self, request, *args, **kwargs):
@@ -105,7 +106,7 @@ class CourseAverageScoreAPIView(APIView):
 
 class CourseAverageLearningTimeAPIView(APIView):
     permission_classes = [HasModelPermission]
-    app_label = "courses"
+    app_label = "courses_"
     model_name = "course"
     permission_type = "view" 
 
@@ -242,19 +243,26 @@ class StudentTotalHoursAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.http import FileResponse
-from .models import CoursePDF, RecentDownload
-from .serializers import CoursePDFSerializer, RecentDownloadSerializer
-from accounts.permissions import HasModelPermission
-
 
 # -------------------------------
 # COURSE PDF VIEWSET
 # -------------------------------
 class CoursePDFViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    app_label = "courses"
+    model_name = "coursepdf"
+
     queryset = CoursePDF.objects.all().order_by("-uploaded_at")
     serializer_class = CoursePDFSerializer
     permission_classes = [HasModelPermission]
@@ -264,6 +272,21 @@ class CoursePDFViewSet(viewsets.ModelViewSet):
 # RECENT DOWNLOAD VIEWSET
 # -------------------------------
 class RecentDownloadViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    app_label = "courses"
+    model_name = "recentdownload"
+
     queryset = RecentDownload.objects.all().order_by("-downloaded_at")
     serializer_class = RecentDownloadSerializer
     permission_classes = [HasModelPermission]
