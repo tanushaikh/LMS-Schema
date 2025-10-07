@@ -297,6 +297,20 @@ class RecentDownloadViewSet(viewsets.ModelViewSet):
 # -------------------------------
 class PDFDownloadView(APIView):
     permission_classes = [HasModelPermission]
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    app_label = "courses"
+    model_name = "recentdownload"
 
     def get(self, request, course_id, pdf_id):
         try:
