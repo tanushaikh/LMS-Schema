@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, Meeting, CourseEnrollment
+from .models import Course, Meeting, CourseEnrollment,WeeklyStatusTask
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +35,8 @@ class RecentDownloadSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecentDownload
         fields = ["id", "user", "pdf", "pdf_title", "course_title", "downloaded_at"]
+class WeeklyStatusTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeeklyStatusTask
+        fields = "__all__"
+        read_only_fields = ["user", "created_at"]

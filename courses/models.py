@@ -156,3 +156,19 @@ class RecentDownload(models.Model):
 
     def __str__(self):
         return f"{self.user.username} downloaded {self.pdf.title}"
+
+class WeeklyStatusTask(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="weekly_tasks")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="weekly_tasks")
+    day = models.CharField(max_length=20)  # e.g. Monday
+    title = models.CharField(max_length=255)  # e.g. "React Advanced Patterns"
+    duration = models.CharField(max_length=20, default="2h")
+    status = models.CharField(
+        max_length=20,
+        choices=[("completed", "Completed"), ("in-progress", "In Progress"), ("pending", "Pending")],
+        default="pending",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.course.title} - {self.day}: {self.title}"

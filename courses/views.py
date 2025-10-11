@@ -3,10 +3,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Avg
 from accounts.permissions import HasModelPermission
-from django.db import IntegrityError
 from rest_framework.views import APIView
-from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, RecentDownload
-from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer
+from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, RecentDownload,WeeklyStatusTask
+from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer,WeeklyStatusTaskSerializer
 from datetime import date, timedelta
 from django.http import FileResponse
 
@@ -39,10 +38,16 @@ class StudyPlanGenerator:
             "course": self.course.title,
             "week_plan": plan
         }
-
+    
+from django.shortcuts import get_object_or_404
+    
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+    app_label = "courses"
+    model_name = "course"
+
     def get_permissions(self):
         action_permission_map = {
             "create": "add",
@@ -51,15 +56,39 @@ class CourseViewSet(viewsets.ModelViewSet):
             "update": "edit",
             "partial_update": "edit",
             "destroy": "delete",
+            "study_plan": "view",
+            "weekly_plan": "view",
         }
         self.permission_type = action_permission_map.get(self.action, None)
         return super().get_permissions()
 
-    app_label = "courses"
-    model_name = "course"
-
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        course = serializer.save(user=self.request.user)
+        self.generate_weekly_plan(course, self.request.user)
+
+    def perform_update(self, serializer):
+        course = serializer.save(user=self.request.user)
+        # clear old plan of this user for this course
+        WeeklyStatusTask.objects.filter(course=course, user=self.request.user).delete()
+        self.generate_weekly_plan(course, self.request.user)
+
+    def generate_weekly_plan(self, course, user):
+        generator = StudyPlanGenerator(course, days=7)
+        plan = generator.generate_plan()
+
+        if not plan.get("week_plan"):
+            return
+
+        for day, tasks in plan["week_plan"].items():
+            for task in tasks:
+                WeeklyStatusTask.objects.create(
+                    user=user,
+                    course=course,
+                    day=day,
+                    title=task.get("topic", "Untitled"),
+                    duration=task.get("duration", "2h"),
+                    status="pending"
+                )
 
     @action(detail=True, methods=["get"], url_path="study-plan")
     def study_plan(self, request, pk=None):
@@ -72,6 +101,45 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         return Response(plan, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"], url_path="weekly-summary")
+    def weekly_summary(self, request, pk=None):
+        """
+        Returns a day-wise summary of the logged-in user's tasks for this course.
+        Example: { "Monday": {"status": "completed", "duration": "2h"} }
+        """
+        course = self.get_object()
+        tasks = WeeklyStatusTask.objects.filter(course=course, user=request.user)
+
+        summary = {}
+        for task in tasks:
+            summary[task.day] = {
+                "status": task.status,
+                "duration": task.duration
+            }
+
+        return Response(summary, status=200)
+
+    def user_weekly_summary(self, request, course_id=None, user_id=None):
+        """
+        Returns summary for a given user_id and course_id
+        """
+        course = get_object_or_404(Course, id=course_id)
+        user = get_object_or_404(get_user_model(), id=user_id)
+
+        tasks = WeeklyStatusTask.objects.filter(course=course, user=user)
+
+        summary = {}
+        for task in tasks:
+            summary[task.day] = {
+                "status": task.status,
+                "duration": task.duration
+            }
+
+        return Response({
+            "course": course.title,
+            "user": user.username,
+            "weekly_summary": summary
+        }, status=200)
 class UserStreakAPIView(APIView):
     def get(self, request, *args, **kwargs):
         streak, _ = CourseStreak.objects.get_or_create(user=request.user)
@@ -297,20 +365,19 @@ class RecentDownloadViewSet(viewsets.ModelViewSet):
 # -------------------------------
 class PDFDownloadView(APIView):
     permission_classes = [HasModelPermission]
-    def get_permissions(self):
-        action_permission_map = {
-            "create": "add",
-            "list": "view",
-            "retrieve": "view",
-            "update": "edit",
-            "partial_update": "edit",
-            "destroy": "delete",
-        }
-        self.permission_type = action_permission_map.get(self.action, None)
-        return super().get_permissions()
-
     app_label = "courses"
     model_name = "recentdownload"
+
+    def get_permissions(self):
+        method_permission_map = {
+            "GET": "view",
+            "POST": "add",
+            "PUT": "edit",
+            "PATCH": "edit",
+            "DELETE": "delete",
+        }
+        self.permission_type = method_permission_map.get(self.request.method, None)
+        return super().get_permissions()
 
     def get(self, request, course_id, pdf_id):
         try:
@@ -335,3 +402,26 @@ class PDFDownloadView(APIView):
                 {"status": "error", "message": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        
+class WeeklyStatusTaskViewSet(viewsets.ModelViewSet):
+    queryset = WeeklyStatusTask.objects.all().order_by("-created_at")
+    serializer_class = WeeklyStatusTaskSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "courses"
+    model_name = "weeklystatustask"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
