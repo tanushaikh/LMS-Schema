@@ -8,42 +8,43 @@ from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, Re
 from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer,WeeklyStatusTaskSerializer
 from datetime import date, timedelta
 from django.http import FileResponse
+from django.contrib.auth import get_user_model
+
+from datetime import date, timedelta
 
 class StudyPlanGenerator:
     def __init__(self, course, days: int = 7):
         """
-        Initialize study plan generator.
-        :param course: Course instance
-        :param days: Number of days to split topics into
+        Auto-generate a 7-day weekly study plan for the course.
         """
         self.course = course
         self.days = days
-        self.topics = course.skills if course.skills else []
+        self.duration = course.duration_minutes or 120  # default 2h if not given
+        self.start_date = date.today()
 
     def generate_plan(self):
-        if not self.topics:
-            return {}
-
-        topics_per_day = max(1, len(self.topics) // self.days)
         plan = {}
-        start_date = date.today()
+        minutes_per_day = max(30, self.duration // self.days)
 
         for i in range(self.days):
-            day_topics = self.topics[i * topics_per_day:(i + 1) * topics_per_day]
-            if not day_topics:
-                break
-            plan[str(start_date + timedelta(days=i))] = day_topics
+            day = (self.start_date + timedelta(days=i)).strftime("%A")  # "Monday", "Tuesday"...
+            plan[day] = [{
+                "topic": f"Day {i+1}: {self.course.title}",
+                "duration": f"{minutes_per_day // 60}h {minutes_per_day % 60}m"
+            }]
 
         return {
             "course": self.course.title,
             "week_plan": plan
         }
-    
+
 from django.shortcuts import get_object_or_404
-    
+from rest_framework.permissions import IsAuthenticated
+
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]  # ✅ Require login
 
     app_label = "courses"
     model_name = "course"
@@ -63,25 +64,29 @@ class CourseViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        course = serializer.save(user=self.request.user)
-        self.generate_weekly_plan(course, self.request.user)
+        user = self.request.user
+        print("Create In perform_create, user:", user)
+        course = serializer.save(user=user, created_by=user)
+        self.generate_weekly_plan(course, user)
 
     def perform_update(self, serializer):
-        course = serializer.save(user=self.request.user)
-        # clear old plan of this user for this course
-        WeeklyStatusTask.objects.filter(course=course, user=self.request.user).delete()
-        self.generate_weekly_plan(course, self.request.user)
+        user = self.request.user
+        course = serializer.save(user=user, created_by=user)
+        print("Update In perform_update, user:", user)
+        WeeklyStatusTask.objects.filter(course=course, user=user).delete()
+        self.generate_weekly_plan(course, user)
 
     def generate_weekly_plan(self, course, user):
         generator = StudyPlanGenerator(course, days=7)
         plan = generator.generate_plan()
-
+        print("Generated plan:", plan)
+        print("Generated:", generator)
         if not plan.get("week_plan"):
             return
 
         for day, tasks in plan["week_plan"].items():
             for task in tasks:
-                WeeklyStatusTask.objects.create(
+                task_obj = WeeklyStatusTask.objects.create(
                     user=user,
                     course=course,
                     day=day,
@@ -89,6 +94,8 @@ class CourseViewSet(viewsets.ModelViewSet):
                     duration=task.get("duration", "2h"),
                     status="pending"
                 )
+                print("Created task:", task_obj)
+
 
     @action(detail=True, methods=["get"], url_path="study-plan")
     def study_plan(self, request, pk=None):
@@ -121,25 +128,29 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def user_weekly_summary(self, request, course_id=None, user_id=None):
         """
-        Returns summary for a given user_id and course_id
+        Returns summary for a given user_id and course_id in a list of day-wise objects
         """
         course = get_object_or_404(Course, id=course_id)
         user = get_object_or_404(get_user_model(), id=user_id)
-
-        tasks = WeeklyStatusTask.objects.filter(course=course, user=user)
-
-        summary = {}
+        print("Course:", course)
+        print("User:", user)
+        tasks = WeeklyStatusTask.objects.filter(course=course, user=user).order_by('id')
+        print("Tasks:", tasks)
+        summary = []
         for task in tasks:
-            summary[task.day] = {
+            summary.append({
+                "day": task.day,
                 "status": task.status,
                 "duration": task.duration
-            }
+            })
 
         return Response({
             "course": course.title,
             "user": user.username,
             "weekly_summary": summary
         }, status=200)
+
+
 class UserStreakAPIView(APIView):
     def get(self, request, *args, **kwargs):
         streak, _ = CourseStreak.objects.get_or_create(user=request.user)

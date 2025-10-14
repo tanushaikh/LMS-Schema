@@ -20,7 +20,7 @@ urlpatterns = [
     path("streak/", UserStreakAPIView.as_view(), name="user-streak"),
     path("total-hours/", StudentTotalHoursAPIView.as_view(), name="student-total-hours"),
     path('courses_pdf/<int:course_id>/pdfs/<int:pdf_id>/download/', PDFDownloadView.as_view(), name='pdf-download'),
-    path("courses/<int:course_id>/users/<int:user_id>/weekly-summary/",
+    path("weekly-plans/<int:course_id>/users/<int:user_id>/weekly-summary/",
          CourseViewSet.as_view({"get": "user_weekly_summary"}),
          name="user-weekly-summary"),
 ]

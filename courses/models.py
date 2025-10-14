@@ -160,8 +160,8 @@ class RecentDownload(models.Model):
 class WeeklyStatusTask(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="weekly_tasks")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="weekly_tasks")
-    day = models.CharField(max_length=20)  # e.g. Monday
-    title = models.CharField(max_length=255)  # e.g. "React Advanced Patterns"
+    day = models.CharField(max_length=20)
+    title = models.CharField(max_length=255)
     duration = models.CharField(max_length=20, default="2h")
     status = models.CharField(
         max_length=20,
