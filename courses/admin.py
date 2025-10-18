@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Course,
     Meeting,
-    CourseEnrollment
+    CourseEnrollment,
 )
 
 @admin.register(Course)
@@ -21,4 +21,3 @@ class MeetingAdmin(admin.ModelAdmin):
 @admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'enrolled_on', 'is_completed')
-

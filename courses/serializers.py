@@ -1,9 +1,15 @@
 from rest_framework import serializers
-from .models import Course, Meeting, CourseEnrollment,WeeklyStatusTask
+from .models import Course, Meeting, CourseEnrollment,WeeklyStatusTask,Mentors
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
+        fields = "__all__"
+        read_only_fields = ["slug"]
+
+class MentorsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mentors
         fields = "__all__"
         read_only_fields = ["slug"]
 

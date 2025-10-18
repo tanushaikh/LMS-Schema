@@ -21,6 +21,8 @@ class Course(models.Model):
     status = models.CharField(max_length=200, null=True, blank=True)
     price = models.CharField(max_length=200, null=True, blank=True)
     skills = models.JSONField(default=list, blank=True)
+    features = models.JSONField(default=list, blank=True)
+    highlights = models.JSONField(default=list, blank=True)
     score = models.FloatField(null=True, blank=True, default=0)
     next_lesson = models.CharField(max_length=200, null=True, blank=True)
     completed_lesson = models.IntegerField(null=True, blank=True, default=0)
@@ -172,3 +174,46 @@ class WeeklyStatusTask(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.course.title} - {self.day}: {self.title}"
+
+# -------------------------------
+# Mentors MODEL
+# -------------------------------
+class Mentors(models.Model):
+    name = models.CharField(max_length=200,blank=False,null=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="mentors", null=True, blank=True
+    )
+    title = models.CharField(max_length=200, null=True, blank=True)
+    company  = models.CharField(max_length=200, null=True, blank=True)
+    reviews = models.IntegerField(default=0)
+    students = models.CharField(max_length=200, null=True, blank=True)
+    rating = models.CharField(max_length=200, null=True, blank=True)
+    sessions = models.CharField(max_length=200, null=True, blank=True)
+    experience = models.CharField(max_length=200, null=True, blank=True)
+    locations = models.CharField(max_length=200, null=True, blank=True)
+    price = models.CharField(max_length=200, null=True, blank=True)
+    expertise = models.JSONField(default=list, blank=True)
+    languages = models.JSONField(default=list, blank=True)
+    specialties = models.JSONField(default=list, blank=True)
+    achievements = models.JSONField(default=list, blank=True)
+    education = models.CharField(max_length=200, null=True, blank=True)
+    responseTime = models.CharField(max_length=200, null=True, blank=True)
+    availablity = models.CharField(max_length=200, null=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    hourlyRate = models.FloatField(null=True, blank=True, default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.user.username) if self.user else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            while Course.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"course {self.pk}"
+

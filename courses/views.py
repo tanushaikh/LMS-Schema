@@ -4,8 +4,8 @@ from rest_framework.decorators import action
 from django.db.models import Avg
 from accounts.permissions import HasModelPermission
 from rest_framework.views import APIView
-from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, RecentDownload,WeeklyStatusTask
-from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer,WeeklyStatusTaskSerializer
+from .models import Course, Meeting, CourseEnrollment,CourseStreak,CoursePDF, RecentDownload,WeeklyStatusTask,Mentors
+from .serializers import CourseSerializer, MeetingSerializer, CourseEnrollmentSerializer,CoursePDFSerializer, RecentDownloadSerializer,WeeklyStatusTaskSerializer,MentorsSerializer
 from datetime import date, timedelta
 from django.http import FileResponse
 from django.contrib.auth import get_user_model
@@ -169,7 +169,6 @@ class CourseTotalAPIView(APIView):
     def get(self, request, *args, **kwargs):
         total = Course.objects.count()
         return Response({"total_courses": total}, status=status.HTTP_200_OK)
-
 
 class CourseAverageScoreAPIView(APIView):
     permission_classes = [HasModelPermission]
@@ -414,6 +413,29 @@ class PDFDownloadView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         
+class MentorsViewSet(viewsets.ModelViewSet):
+    queryset = Mentors.objects.all()
+    serializer_class = MentorsSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "courses"
+    model_name = "mentors"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 class WeeklyStatusTaskViewSet(viewsets.ModelViewSet):
     queryset = WeeklyStatusTask.objects.all().order_by("-created_at")
     serializer_class = WeeklyStatusTaskSerializer
