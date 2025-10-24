@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AITutorInteraction, Notification, Feedback, Bookmark, Discussion
+from .models import AITutorInteraction, Notification, Feedback, Bookmark, Discussion,Blog
 
 class AITutorInteractionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,4 +28,9 @@ class BookmarkSerializer(serializers.ModelSerializer):
 class DiscussionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discussion
+        fields = '__all__'
+
+class BlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
         fields = '__all__'

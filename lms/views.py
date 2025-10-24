@@ -1,9 +1,10 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from accounts.permissions import HasModelPermission
-from .models import AITutorInteraction, Notification, Feedback, Bookmark, Discussion
+from .models import AITutorInteraction, Blog, Notification, Feedback, Bookmark, Discussion
 from .serializers import (
     AITutorInteractionSerializer,
+    BlogSerializer,
     NotificationSerializer,
     FeedbackSerializer,
     BookmarkSerializer,
@@ -168,5 +169,37 @@ class DiscussionViewSet(viewsets.ModelViewSet):
         instance.delete()
         return Response(
             {"message": "discussion deleted successfully"},
+            status=status.HTTP_200_OK
+        )
+
+class BlogViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    permission_classes = [HasModelPermission]
+
+    app_label = "lms"
+    model_name = "blog"
+
+    def get_permissions(self):
+        action_permission_map = {
+            "create": "add",
+            "list": "view",
+            "retrieve": "view",
+            "update": "edit",
+            "partial_update": "edit",
+            "destroy": "delete",
+        }
+        self.permission_type = action_permission_map.get(self.action, None)
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+            
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Blog deleted successfully"},
             status=status.HTTP_200_OK
         )
