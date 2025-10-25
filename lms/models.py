@@ -144,3 +144,42 @@ class Blog(models.Model):
                 self.slug = f"{base_slug}-{unique_suffix}"
 
         super().save(*args, **kwargs)
+
+from django.db import models
+
+class ContactUs(models.Model):
+    icon = models.URLField(max_length=500, blank=True, null=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    contact = models.CharField(max_length=255, blank=True, null=True)
+    responseTime = models.CharField(max_length=100, blank=True, null=True)
+    color = models.CharField(max_length=50, blank=True, null=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=255, blank=True, null=True)
+    category = models.CharField(max_length=100, blank=True, null=True)
+    message = models.TextField()
+    city = models.CharField(max_length=100, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    zipCode = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    timezone = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(unique=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="contact", null=True, blank=True
+    )
+    def __str__(self):
+        return f"{self.name} - {self.subject or 'No Subject'}"
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title) if self.title else "anon"
+            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            self.slug = f"{base_slug}-{unique_suffix}"
+            
+            # Ensure slug is unique (extra safety)
+            while ContactUs.objects.filter(slug=self.slug).exists():
+                unique_suffix = str(uuid.uuid4())[:8]
+                self.slug = f"{base_slug}-{unique_suffix}"
+
+        super().save(*args, **kwargs)
