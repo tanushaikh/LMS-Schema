@@ -1,5 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from accounts.permissions import HasModelPermission
 from .models import AITutorInteraction, Blog, ContactUs, Notification, Feedback, Bookmark, Discussion
 from .serializers import (
@@ -235,3 +238,10 @@ class ContactUsViewSet(viewsets.ModelViewSet):
             {"message": "Contact Us deleted successfully"},
             status=status.HTTP_200_OK
         )
+from rest_framework import viewsets
+from .models import FAQCategory
+from .serializers import FAQCategorySerializer
+
+class FAQCategoryViewSet(viewsets.ModelViewSet):
+    queryset = FAQCategory.objects.all()
+    serializer_class = FAQCategorySerializer
