@@ -199,3 +199,54 @@ class Question(models.Model):
 
     def __str__(self):
         return self.text
+
+class LiveClass(models.Model):
+    title = models.CharField(max_length=200)
+    instructor = models.CharField(max_length=100)
+    date = models.DateField()
+    time = models.CharField(max_length=50)
+    duration = models.CharField(max_length=50)
+    format = models.CharField(max_length=50, default="live")
+    students = models.IntegerField()
+    maxStudents = models.IntegerField()
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    rating = models.FloatField()
+    description = models.TextField()
+    topics = models.JSONField()
+    level = models.CharField(max_length=50)
+    language = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.title
+
+
+class OnDemandClass(models.Model):
+    title = models.CharField(max_length=200)
+    instructor = models.CharField(max_length=100)
+    duration = models.CharField(max_length=50)
+    totalHours = models.CharField(max_length=50)
+    format = models.CharField(max_length=50, default="on-demand")
+    students = models.IntegerField()
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    rating = models.FloatField()
+    description = models.TextField()
+    topics = models.JSONField()
+    level = models.CharField(max_length=50)
+    language = models.CharField(max_length=50)
+    completion = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+
+class UpcomingEvent(models.Model):
+    title = models.CharField(max_length=200)
+    date = models.DateField()
+    time = models.CharField(max_length=50)
+    type = models.CharField(max_length=100)
+    speakers = models.JSONField()
+    price = models.CharField(max_length=50)
+    attendees = models.IntegerField()
+
+    def __str__(self):
+        return self.title

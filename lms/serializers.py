@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AITutorInteraction, ContactUs, Notification, Feedback, Bookmark, Discussion,Blog
+from .models import AITutorInteraction, ContactUs, LiveClass, Notification, Feedback, Bookmark, Discussion,Blog, OnDemandClass, UpcomingEvent
 
 class AITutorInteractionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,3 +73,20 @@ class FAQCategorySerializer(serializers.ModelSerializer):
         for question_data in questions_data:
             Question.objects.create(category=instance, **question_data)
         return instance
+
+class LiveClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LiveClass
+        fields = '__all__'
+
+
+class OnDemandClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OnDemandClass
+        fields = '__all__'
+
+
+class UpcomingEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UpcomingEvent
+        fields = '__all__'
