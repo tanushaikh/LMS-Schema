@@ -36,19 +36,18 @@ class Assignment(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.created_by.username) if self.created_by.username else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
-            self.slug = f"{base_slug}-{unique_suffix}"
+            unique_suffix = str(uuid.uuid4())[:16]  # 16-char random string
+            self.slug = f"{unique_suffix}"
             
             # Ensure slug is unique (extra safety)
             while Assignment.objects.filter(slug=self.slug).exists():
-                unique_suffix = str(uuid.uuid4())[:8]
-                self.slug = f"{base_slug}-{unique_suffix}"
+                unique_suffix = str(uuid.uuid4())[:16]
+                self.slug = f"{unique_suffix}"
 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return f"{self.assignment.title if self.assignment else 'No Assignment'} - {self.user.username if self.user else 'Anonymous'}"
 
 
 class AssignmentSubmission(models.Model):
