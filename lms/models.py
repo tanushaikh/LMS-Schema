@@ -63,30 +63,26 @@ class Feedback(models.Model):
     slug = models.SlugField(unique=True)
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
-            self.slug = f"{base_slug}-{unique_suffix}"
+            unique_suffix = str(uuid.uuid4())[:16]  # 16-char random string
+            self.slug = f"{unique_suffix}"
             
-            # Ensure slug is unique (extra safety)
             while Feedback.objects.filter(slug=self.slug).exists():
-                unique_suffix = str(uuid.uuid4())[:8]
-                self.slug = f"{base_slug}-{unique_suffix}"
+                unique_suffix = str(uuid.uuid4())[:16]
+                self.slug = f"{unique_suffix}"
 
         super().save(*args, **kwargs)
 
-# Bookmark
 class Bookmark(models.Model):
     user = models.ForeignKey("accounts.User",  on_delete=models.SET_NULL, null=True, blank=True)
-    #session = models.ForeignKey(Session, on_delete=models.CASCADE)
     note = models.TextField(blank=True)
     slug = models.SlugField(unique=True)
     def save(self, *args, **kwargs):
+
         if not self.slug:
             base_slug = slugify(self.user.username) if self.user else "anon"
-            unique_suffix = str(uuid.uuid4())[:8]  # 8-char random string
+            unique_suffix = str(uuid.uuid4())[:8]
             self.slug = f"{base_slug}-{unique_suffix}"
             
-            # Ensure slug is unique (extra safety)
             while Bookmark.objects.filter(slug=self.slug).exists():
                 unique_suffix = str(uuid.uuid4())[:8]
                 self.slug = f"{base_slug}-{unique_suffix}"
@@ -171,6 +167,7 @@ class ContactUs(models.Model):
     )
     def __str__(self):
         return f"{self.name} - {self.subject or 'No Subject'}"
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.title) if self.title else "anon"
